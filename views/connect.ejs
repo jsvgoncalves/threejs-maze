@@ -3,9 +3,20 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascripts/main.js"></script>
   </head>
   <body>
     <h1><%= title %></h1>
-    <p>click to connect to server</p><button onclick=" location.href = 'http://localhost:3000/start_connection' ">Connect</button>
+    <p>click to connect to server</p></br>
+	<!--<form method="POST" name="form_connect" action="javascript:start_connection();" > -->
+		<label>username</label>
+		<input type="text" id="name" placeholder="Username" ></input></br>
+		<label>host</label>
+		<input type="text" id="host" placeholder="host" ></input></br>
+		<label>port</label>
+		<input type="text" id="port" placeholder="port" ></input>
+		<input type="button" value="Connect" onClick="start_connection();" />
+  	<!--</form>-->
   </body>
 </html>
