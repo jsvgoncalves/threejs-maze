@@ -14,16 +14,49 @@ function start_connection(){
     if (lastdot > 1) {
         loginurl = pathname.substr(1, lastdot);
     }
-    alert('login url' + loginurl);
+
+
+
+    if ("WebSocket" in window)
+      {
+         alert("WebSocket is supported by your Browser!");
+         // Let us open a web socket
+         var ws = new WebSocket("ws://" + host + ":" + port + "/labyrinth");
+         ws.onopen = function()
+         {
+            // Web Socket is connected, send data using send()
+            ws.send("Message to send");
+            alert("Message is sent...");
+         };
+         ws.onmessage = function (evt) 
+         { 
+            var received_msg = evt.data;
+            alert(received_msg);
+         };
+         ws.onclose = function()
+         { 
+            // websocket is closed.
+            alert("Connection is closed..."); 
+         };
+      }
+      else
+      {
+         // The browser doesn't support WebSocket
+         alert("WebSocket NOT supported by your Browser!");
+      }
+
+
+
+    //alert('login url' + loginurl);
     //loginurl + 'labyrinth'  
-    var socket = io.connect('ws://' + host + ':' + port, {'resource':'labyrinth'});
+    /*var socket = io.connect('ws://' + host + ':' + port, {'resource':'labyrinth'});
 
     socket.on('error', function(e){
-    	alert('error:' + e);
+    	console.log('error:' + e);
     });
     
     socket.on('chat', function(data){
-        alert('resposta recebidac: ' + data);
+        console.log('resposta recebidac: ' + data);
     });
 
 
@@ -36,16 +69,16 @@ function start_connection(){
 
 	socket.on('connect', function () {
       
-		alert('connected');
+		console.log('connected');
 
         socket.emit('chat', 'lol\n');
-		socket.on('disconnect', function () {
-	        alert('DISCONNESSO!!! ');
-	        
+		socket.on('disconnect', function (e) {
+	        console.log('DISCONNESSO!!! ' + e);
+	        socket.disconnect();
         });
 
 
-    });
+    });*/
 
 
 
