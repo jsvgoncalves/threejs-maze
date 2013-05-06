@@ -6,7 +6,8 @@ function start_connection(){
 
 	var host = $('#host').val(),
 		port = $('#port').val(),
-        inc = 0;
+        inc = 0,
+        delim = String.fromCharCode(166);
 	
 	//var socket = io.connect('', {'resource': '/chat'});
 	 var loginurl = "";
@@ -26,16 +27,16 @@ function start_connection(){
          ws.onopen = function()
          {
             // Web Socket is connected, send data using send()
-            ws.send("Message to send");
+            ws.send("9" + delim + "0" + delim + "0\n");
             console.log("Message is sent...");
          };
          ws.onmessage = function (evt) 
          { 
             var received_msg = evt.data;
             console.log('message received: ' + received_msg);
-            if(inc < 5)
+            if(inc < 1)
             {
-                ws.send('isto é giro ' + inc);
+                ws.send("0" + delim + "0" + delim + "0\n");
                 inc++;
             }
             
