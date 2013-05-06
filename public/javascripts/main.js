@@ -16,7 +16,7 @@ function start_connection(){
     }
     alert('login url' + loginurl);
     //loginurl + 'labyrinth'  
-    var socket = io.connect('ws://' + host + ':' + port, {'resource':'/labyrinth'});
+    var socket = io.connect('ws://' + host + ':' + port, {'resource':'labyrinth'});
 
     socket.on('error', function(e){
     	alert('error:' + e);
