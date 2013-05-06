@@ -5,7 +5,8 @@ var socket;
 function start_connection(){
 
 	var host = $('#host').val(),
-		port = $('#port').val();
+		port = $('#port').val(),
+        inc = 0;
 	
 	//var socket = io.connect('', {'resource': '/chat'});
 	 var loginurl = "";
@@ -32,6 +33,8 @@ function start_connection(){
          { 
             var received_msg = evt.data;
             console.log('message received: ' + received_msg);
+            ws.send('isto é giro' + inc);
+            inc++;
          };
          ws.onclose = function()
          { 
