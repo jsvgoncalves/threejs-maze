@@ -33,8 +33,12 @@ function start_connection(){
          { 
             var received_msg = evt.data;
             console.log('message received: ' + received_msg);
-            ws.send('isto é giro' + inc);
-            inc++;
+            if(inc < 5)
+            {
+                ws.send('isto é giro ' + inc);
+                inc++;
+            }
+            
          };
          ws.onclose = function()
          { 
