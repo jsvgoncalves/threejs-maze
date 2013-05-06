@@ -29,6 +29,11 @@ function start_connection(){
 
 
 
+    
+
+
+
+
 	socket.on('connect', function () {
       
 		alert('connected');
