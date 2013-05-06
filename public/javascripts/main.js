@@ -19,30 +19,30 @@ function start_connection(){
 
     if ("WebSocket" in window)
       {
-         alert("WebSocket is supported by your Browser!");
+         console.log("WebSocket is supported by your Browser!");
          // Let us open a web socket
          var ws = new WebSocket("ws://" + host + ":" + port + "/labyrinth");
          ws.onopen = function()
          {
             // Web Socket is connected, send data using send()
             ws.send("Message to send");
-            alert("Message is sent...");
+            console.log("Message is sent...");
          };
          ws.onmessage = function (evt) 
          { 
             var received_msg = evt.data;
-            alert(received_msg);
+            console.log('message received: ' + received_msg);
          };
          ws.onclose = function()
          { 
             // websocket is closed.
-            alert("Connection is closed..."); 
+            console.log("Connection is closed..."); 
          };
       }
       else
       {
          // The browser doesn't support WebSocket
-         alert("WebSocket NOT supported by your Browser!");
+         console.log("WebSocket NOT supported by your Browser!");
       }
 
 
