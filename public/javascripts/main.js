@@ -14,12 +14,12 @@ function start_connection(){
     if (lastdot > 1) {
         loginurl = pathname.substr(1, lastdot);
     }
+    alert('login url' + loginurl);
+    //loginurl + 'labyrinth'  
+    var socket = io.connect('ws://' + host + ':' + port, {'resource':'/labyrinth'});
 
-
-    var socket = io.connect('ws://' + host + ':' + port, {'resource':loginurl + 'labyrinth'});
-
-    socket.on('error', function(reason){
-    	alert('error:' + reason);
+    socket.on('error', function(e){
+    	alert('error:' + e);
     });
     
     socket.on('chat', function(data){
