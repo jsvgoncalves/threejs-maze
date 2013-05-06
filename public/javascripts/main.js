@@ -1,21 +1,22 @@
 
-var socket;
+var socket,
+    game_socket,
+    game_port,
+    host,
+    port,
+    delim = String.fromCharCode(166);
 
 
 function start_connection(){
 
-	var host = $('#host').val(),
-		port = $('#port').val(),
-        inc = 0,
-        delim = String.fromCharCode(166);
+	host = $('#host').val();
+  port = $('#port').val();
+  var inc = 0;
+      
 	
 	//var socket = io.connect('', {'resource': '/chat'});
-	 var loginurl = "";
-    var pathname = document.location.pathname;
-    var lastdot = pathname.lastIndexOf("/");
-    if (lastdot > 1) {
-        loginurl = pathname.substr(1, lastdot);
-    }
+	 
+    
 
 
 
@@ -23,16 +24,35 @@ function start_connection(){
       {
          console.log("WebSocket is supported by your Browser!");
          // Let us open a web socket
-         var ws = new WebSocket("ws://" + host + ":" + port + "/labyrinth");
+         console.log("ws://" + host + ":" + port + "/server");
+         var ws = new WebSocket("ws://" + host + ":" + port + "/server");
          ws.onopen = function()
          {
             // Web Socket is connected, send data using send()
-            ws.send("9" + delim + "0" + delim + "0\n");
-            console.log("Message is sent...");
+            ws.send("0" + delim + "0" + delim + "0\n");
+            console.log("sending preferences...");
          };
+
+
          ws.onmessage = function (evt) 
          { 
             var received_msg = evt.data;
+
+            var tokens = received_msg.split(delim);
+
+            if(tokens.length == 2)
+            {
+                game_port = parseInt(tokens[1]);
+                if( game_port == -1 )
+                {
+                    ws.send("0" + delim + "0" + delim + "0\n");
+                }else
+                {
+                    ws.close();
+                    start_game_connection(game_port);
+                }
+            }
+
             console.log('message received: ' + received_msg);
             if(inc < 1)
             {
@@ -54,42 +74,41 @@ function start_connection(){
       }
 
 
-
-    //alert('login url' + loginurl);
-    //loginurl + 'labyrinth'  
-    /*var socket = io.connect('ws://' + host + ':' + port, {'resource':'labyrinth'});
-
-    socket.on('error', function(e){
-    	console.log('error:' + e);
-    });
-    
-    socket.on('chat', function(data){
-        console.log('resposta recebidac: ' + data);
-    });
+}
 
 
+function start_game_connection(port)
+{
+    console.log("ws://" + host + ":" + game_port + "/labyrinth");
+    game_socket = new WebSocket("ws://" + host + ":" + game_port + "/labyrinth");
+
+    game_socket.onopen = function()
+    {
+        /*
+
+        lançar ambiente de jogo e iniciar comunicação de jogo
+        */
+    }
+
+    game_socket.onmessage = function(evt)
+    {
+        message = evt.data;
+
+        /*
+
+        por fazer tratamento de mensagens que o servidor envia
 
 
-    
+        */
+    }
 
 
+    game_socket.onclose = function()
+    {
+        /*
+            por fazer fechar ambiente de jogo e voltar para o menu de ligaçao. 
 
-
-	socket.on('connect', function () {
-      
-		console.log('connected');
-
-        socket.emit('chat', 'lol\n');
-		socket.on('disconnect', function (e) {
-	        console.log('DISCONNESSO!!! ' + e);
-	        socket.disconnect();
-        });
-
-
-    });*/
-
-
-
-
+        */
+    }
 
 }
