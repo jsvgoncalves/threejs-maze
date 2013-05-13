@@ -9,7 +9,10 @@ form,*/
 var delim = String.fromCharCode(166),
     $status = null,
     $form = null,
-    game_started = false;
+    server_connected = false,
+    game_connected = false,
+    socket = null,
+    game_socket = null;
 
 
 function start_connection(){
@@ -29,6 +32,18 @@ function start_connection(){
 	
 	//var socket = io.connect('', {'resource': '/chat'});
 	 
+
+
+window.onbeforeunload = function(){
+    write_status("closing connection...");
+    if(server_connected && socket != null){
+      socket.close();
+    }
+
+    if(game_connected && game_socket != null){
+      game_socket.close();
+    }
+}
     
 
 
@@ -39,16 +54,17 @@ function start_connection(){
          // Let us open a web socket
          write_status("connecting...");
          console.log("ws://" + host + ":" + port + "/server");
-         var ws = new WebSocket("ws://" + host + ":" + port + "/server");
-         ws.onopen = function()
+         socket = new WebSocket("ws://" + host + ":" + port + "/server");
+         socket.onopen = function()
          {
+            server_connected = true;
             //Web Socket is connected, send data using send()
-            ws.send("0" + delim + "0" + delim + "0\n");
+            socket.send("0" + delim + "0" + delim + "1\n");
             write_status("sending preferences...");
          };
 
 
-         ws.onmessage = function (evt) 
+         socket.onmessage = function (evt) 
          { 
             var received_msg = evt.data;
 
@@ -59,10 +75,10 @@ function start_connection(){
                 game_port = parseInt(tokens[1]);
                 if( game_port == -1 )
                 {
-                    ws.send("0" + delim + "0" + delim + "0\n");
+                    socket.send("0" + delim + "0" + delim + "1\n");
                 }else
                 {
-                    ws.close();
+                    socket.close();
                     start_game_connection(game_port);
                 }
             }
@@ -75,9 +91,10 @@ function start_connection(){
             }*/
             
          };
-         ws.onclose = function()
+         socket.onclose = function()
          { 
             // websocket is closed.
+            server_connected = false;
             console.log("Connection is closed..."); 
          };
       }
@@ -105,9 +122,9 @@ function start_game_connection(port)
 
     game_socket.onopen = function()
     {
-        game_started = true;
+        game_connected = true;
         console.log('ligado ao jogo');
-        game_socket.send("5" + delim + "0" + delim + "0" + delim + "testes\n");
+        game_socket.send("5" + delim + "0" + delim + "1" + delim + "testes\n");
 
         /*
 
@@ -151,5 +168,16 @@ function reset(){
   $form.show();
   $status.hide();
   $status.html("");
-  game_started = false;
+  game_connected = false;
+}
+
+
+
+
+
+function disconnect(){
+  if(game_connected){
+    game_socket.close();
+    reset();
+  }
 }
