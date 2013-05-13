@@ -9,29 +9,11 @@ form,*/
 var delim = String.fromCharCode(166),
     $status = null,
     $form = null,
+    player_name = null,
     server_connected = false,
     game_connected = false,
     socket = null,
     game_socket = null;
-
-
-function start_connection(){
-
-	host = $('#host').val();
-  port = $('#port').val();
-  var inc = 0;
-    
-  $form = $('.container');
-  $status = $('#absoluteCenter');
-
-
-  $form.hide();
-  $status.show();
-
-   
-	
-	//var socket = io.connect('', {'resource': '/chat'});
-	 
 
 
 window.onbeforeunload = function(){
@@ -44,9 +26,25 @@ window.onbeforeunload = function(){
       game_socket.close();
     }
 }
+
+
+
+function start_connection(){
+
+	host = $('#host').val();
+  port = $('#port').val();
+  player_name = $('#name').val();
+  var inc = 0;
     
+  $form = $('.container');
+  $status = $('#absoluteCenter');
 
 
+  $form.hide();
+  $status.show();
+
+	//var socket = io.connect('', {'resource': '/chat'});
+	 
 
     if ("WebSocket" in window)
       {
@@ -124,7 +122,7 @@ function start_game_connection(port)
     {
         game_connected = true;
         console.log('ligado ao jogo');
-        game_socket.send("5" + delim + "0" + delim + "1" + delim + "testes\n");
+        game_socket.send("5" + delim + "0" + delim + "1" + delim + player_name + "\n");
 
         /*
 
