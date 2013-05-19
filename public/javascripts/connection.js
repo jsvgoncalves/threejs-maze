@@ -13,10 +13,12 @@ var delim = String.fromCharCode(166),
     server_connected = false,
     game_connected = false,
     socket = null,
-    game_socket = null;
+    game_socket = null,
+    $errorp = null;
 
 
 window.onbeforeunload = function(){
+  alert("closing");
     write_status("closing connection...");
     if(server_connected && socket != null){
       socket.close();
@@ -38,8 +40,9 @@ function start_connection(){
     
   $form = $('.container');
   $status = $('#absoluteCenter');
+  $errorp = $('#error_panel');
 
-
+  $errorp.html("");
   $form.hide();
   $status.show();
 
@@ -105,6 +108,35 @@ function start_connection(){
 
 }
 
+/**
+var ID_INFO = 0,
+  ID_INFO_PORT = 1,
+  ID_INFO_MAP = 2,
+  ID_INFO_PLAYER = 3,
+  ID_INFO_GAME = 4,
+  ID_PLAYER_INFO = 5,
+  ID_PLAYER_EXIT = 6,
+  ID_INFO_SERVER = 7,
+  ID_INFO_GAME_STATUS = 8,
+  ID_INFO_GAME_COUNT_PLAYERS = 9,
+  ID_INFO_ADD_PLAYER = 10,
+  ID_INFO_REMOVE_PLAYER = 11,
+  ID_INFO_EXIT = 12,
+  ID_UPDATE_PLAYER = 13;
+
+var SERVER_ACCEPTED = 0,
+  SERVER_REJECTED = 1;
+
+var ID_ERROR_NAME_DUPLICATE = 0,
+  ID_ERROR_INVALID_PARAMS = 1,
+  ID_ERROR_CLOSED = 2;
+
+var GAME_STATUS_INIT = 0,
+  GAME_STATUS_RUNNING = 1,
+  GAME_STATUS_STOPPED = 2,
+  GAME_STATUS_BREAK = 3,
+  GAME_STATUS_IDLE = 4;
+  */
 
 function start_game_connection(port)
 {
@@ -117,7 +149,7 @@ function start_game_connection(port)
     {
         game_connected = true;
         console.log('ligado ao jogo');
-        game_socket.send("5" + delim + "0" + delim + "1" + delim + player_name + "\n");
+        game_socket.send(ID_PLAYER_INFO.toString() + delim + "0" + delim + "1" + delim + player_name + "\n");
 
         /*
 
@@ -128,14 +160,56 @@ function start_game_connection(port)
     game_socket.onmessage = function(evt)
     {
         message = evt.data;
-        write_status("Connected to game");
+        
         console.log('message received from game: ' + message);
-        var tokens = received_msg.split(delim);
+        var tokens = message.split(delim);
 
-        if(tokens[0])
-        {
+        switch(parseInt(tokens[0])){
+          case ID_INFO_EXIT:
+            switch(parseInt(tokens[1])){
+              case ID_ERROR_NAME_DUPLICATE:
+                $errorp.html("Name Allready in use. Please use another one or retry again");
+                break;
+              case ID_ERROR_INVALID_PARAMS:
+                $errorp.html("Invalid params or invalid communication between client and server. Refresh your browser or try again");
+                break;
+              case ID_ERROR_CLOSED:
+                $errorp.html("Server closed this connection. Try again to connect");
+                break;
+              default:
+                $errorp.html("Unknown error.");
+                break;
+            }
+            //game_socket.close();
+            //reset();
+            break;
+          case ID_INFO_SERVER:
+          console.log("received answer: " + parseInt(tokens[1]));
+            if(parseInt(tokens[1]) == 0){
+                write_status("Connected to game");
+                game_socket.send(ID_INFO_GAME.toString() + "\n");
+            }else{
+              $errorp.html("Connection rejected. Try again");
+              game_socket.close();
+              reset();
+            }
+            break;
+          case ID_INFO_GAME_STATUS:
+            var game_status = parseInt(tokens[1]),
+                player_status = parseInt(tokens[2]),
+                info_players = jQuery.parseJSON(tokens[3]);
+              console.log("info players received: " + JSON.stringify(info_players));
+              console.log("game state : " + game_status + " player status: " + player_status);
 
+            break;
+          case ID_INFO_MAP:
+            var map = jQuery.parseJSON(tokens[1]);
+            console.log("received map: " + JSON.stringify(map));
+            break;
+          default:
+            break;
         }
+       
 
         /*
 
@@ -165,10 +239,10 @@ function write_status(message){
 }
 
 function reset(){
+  game_connected = false;
   $form.show();
   $status.hide();
   $status.html("");
-  game_connected = false;
 }
 
 
