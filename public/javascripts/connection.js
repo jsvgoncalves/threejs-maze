@@ -81,12 +81,7 @@ function start_connection(){
                 }
             }
 
-            
-            /*if(inc < 1)
-            {
-                ws.send("0" + delim + "0" + delim + "0\n");
-                inc++;
-            }*/
+           
             
          };
          socket.onclose = function()
@@ -134,7 +129,14 @@ function start_game_connection(port)
     {
         message = evt.data;
         write_status("Connected to game");
-        console.log('message received game: ' + message);
+        console.log('message received from game: ' + message);
+        var tokens = received_msg.split(delim);
+
+        if(tokens[0])
+        {
+
+        }
+
         /*
 
         por fazer tratamento de mensagens que o servidor envia
