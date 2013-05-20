@@ -6,6 +6,7 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script type="text/javascript" src="/javascripts/global.js"></script>
     <script type="text/javascript" src="/javascripts/connection.js"></script>
+    <script type="text/javascript" src="/javascripts/game.js"></script>
   </head>
   <body>
     <div  id="error_panel">
@@ -13,15 +14,16 @@
     <div class="container">
       <h1><%= title %></h1>
       <p>click to connect to server</p></br>
-  	<!--<form method="POST" name="form_connect" action="javascript:start_connection();" > -->
-  		<label>username</label>
-  		<input type="text" id="name" placeholder="Username" ></input></br>
-  		<label>host</label>
-  		<input type="text" id="host" placeholder="host" ></input></br>
-  		<label>port</label>
-  		<input type="text" id="port" placeholder="port" value="4000"></input>
-  		<input type="button" value="Connect" onClick="start_connection();" />
-    	<!--</form>-->
+      <form name="form_connect" action="javascript:start_connection();" >
+    		<label>username</label>
+    		<input type="text" id="name" placeholder="Username" value="Guest"></input></br>
+    		<label>host</label>
+    		<input type="text" id="host" placeholder="host" value="172.30.91.220"></input></br>
+    		<label>port</label>
+    		<input type="text" id="port" placeholder="port" value="4000"></input>
+        <button id="connect">Connect</button>
+    		<!-- <input type="button" value="Connect" onClick="start_connection();" /> -->
+      </form>
     </div>
 
     <div id="absoluteCenter"  style="display:none">
