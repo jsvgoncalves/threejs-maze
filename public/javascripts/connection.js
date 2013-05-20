@@ -1,11 +1,4 @@
 
-/*socket,
-game_socket,
-game_port,
-host,
-port,
-status = $('#absoluteCenter'),
-form,*/
 var delim = String.fromCharCode(166),
     $status = null,
     $form = null,
@@ -17,18 +10,19 @@ var delim = String.fromCharCode(166),
     $errorp = null;
 
 
-window.onbeforeunload = function(){
-  alert("closing");
+window.onbeforeunload = function(e){
+    console.log("closing");
     write_status("closing connection...");
     if(server_connected && socket != null){
       socket.close();
     }
 
     if(game_connected && game_socket != null){
+      console.log("desliga o socket de jogo");
       game_socket.close();
     }
-}
 
+}
 
 
 function start_connection(){
@@ -168,20 +162,19 @@ function start_game_connection(port)
           case ID_INFO_EXIT:
             switch(parseInt(tokens[1])){
               case ID_ERROR_NAME_DUPLICATE:
-                $errorp.html("Name Allready in use. Please use another one or retry again");
+                write_error("Name Allready in use. Please use another one or retry again");
                 break;
               case ID_ERROR_INVALID_PARAMS:
-                $errorp.html("Invalid params or invalid communication between client and server. Refresh your browser or try again");
+                write_error("Invalid params or invalid communication between client and server. Refresh your browser or try again");
                 break;
               case ID_ERROR_CLOSED:
-                $errorp.html("Server closed this connection. Try again to connect");
+                write_error("Server closed this connection. Try again to connect");
                 break;
               default:
-                $errorp.html("Unknown error.");
+                write_error("Unknown error.");
                 break;
             }
-            //game_socket.close();
-            //reset();
+           
             break;
           case ID_INFO_SERVER:
           console.log("received answer: " + parseInt(tokens[1]));
@@ -189,10 +182,12 @@ function start_game_connection(port)
                 write_status("Connected to game");
                 game_socket.send(ID_INFO_GAME.toString() + "\n");
             }else{
-              $errorp.html("Connection rejected. Try again");
+              write_error("Connection rejected. Try again");
               game_socket.close();
               reset();
+
             }
+
             break;
           case ID_INFO_GAME_STATUS:
             var game_status = parseInt(tokens[1]),
@@ -201,10 +196,28 @@ function start_game_connection(port)
               console.log("info players received: " + JSON.stringify(info_players));
               console.log("game state : " + game_status + " player status: " + player_status);
 
+              /**----------------------------------------------------------------------------------------------------------------
+              aqui fazes alocaçao da informação recebida como determinar se o jogo acabou ou se um existe jogadores novos, etc etc 
+              **/
+
+
             break;
           case ID_INFO_MAP:
             var map = jQuery.parseJSON(tokens[1]);
             console.log("received map: " + JSON.stringify(map));
+
+            /**----------------------------------------------------------------------------------------------------------------
+             aqui recebes o mapa. defines ele no teu ambiente webgl
+             **/
+            break;
+          case ID_UPDATE_PLAYER:
+            var name = tokens[1],
+                status = parseInt(tokens[2]),
+                coords = tokens[3].replace("[", "").replace("]","").split(",");
+
+            /**----------------------------------------------------------------------------------------------------------------
+            aqui recebes update de um player , deves verificar se ele existe ,caso nao existe adicionas, fazes update da sua posiçao e do seu estado
+            **/
             break;
           default:
             break;
@@ -223,6 +236,7 @@ function start_game_connection(port)
     game_socket.onclose = function()
     {
       console.log("game connection closed");
+      write_error("game connection closed");
       reset();
         /*
             por fazer fechar ambiente de jogo e voltar para o menu de ligaçao. 
@@ -243,6 +257,15 @@ function reset(){
   $form.show();
   $status.hide();
   $status.html("");
+}
+
+
+function write_error(msg)
+{
+  if($errorp.html().length == 0){
+    $errorp.html(msg);
+  }
+   
 }
 
 
