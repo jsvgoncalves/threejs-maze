@@ -1,56 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/javascripts/global.js"></script>
-    <script type="text/javascript" src="/javascripts/connection.js"></script>
-    <script type="text/javascript" src="/javascripts/game.js"></script>
-  </head>
-  <body>
-    <div  id="error_panel">
-    </div>
-    <div class="container">
-      <h1><%= title %></h1>
-      <p>click to connect to server</p></br>
-      <form name="form_connect" action="javascript:start_connection();" >
-    		<label>username</label>
-    		<input type="text" id="name" placeholder="Username" value="Guest"></input></br>
-    		<label>host</label>
-    		<input type="text" id="host" placeholder="host" value="172.30.91.220"></input></br>
-    		<label>port</label>
-    		<input type="text" id="port" placeholder="port" value="4000"></input>
-        <button id="connect">Connect</button>
-    		<!-- <input type="button" value="Connect" onClick="start_connection();" /> -->
-      </form>
-    </div>
+	<head>
+		<title><%= title %></title>
+		<link rel='stylesheet' href='/stylesheets/style.css' />
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="/javascripts/three.min.js"></script>
+		<script src="/javascripts/FirstPersonControls.js"></script>
+		<script type="text/javascript" src="/javascripts/global.js"></script>
+		<script type="text/javascript" src="/javascripts/connection.js"></script>
+		<script type="text/javascript" src="/javascripts/drawing.js"></script>
+		<script type="text/javascript" src="/javascripts/game.js"></script>
+	</head>
+	<body>
+		<div  id="error_panel">
+		</div>
+		<div class="container">
+			<h1><%= title %></h1>
+			<p>click to connect to server</p></br>
+			<form name="form_connect" action="javascript:start_connection();" >
+				<label>username</label>
+				<input type="text" id="name" placeholder="Username" value="Guest"></input></br>
+				<label>host</label>
+				<input type="text" id="host" placeholder="host" value="188.140.117.226"></input></br>
+				<label>port</label>
+				<input type="text" id="port" placeholder="port" value="4000"></input>
+				<button id="connect">Connect</button>
+				<!-- <input type="button" value="Connect" onClick="start_connection();" /> -->
+			</form>
+		</div>
 
-    <div id="absoluteCenter"  style="display:none">
-    </div>
+		<div id="absoluteCenter"  style="display:none">
+		</div>
 
 
 
-   
-  </body>
+	 
+	</body>
 
-  <style type="text/css">
+	<style type="text/css">
 
-    #absoluteCenter {
-      width:800px;
-      border-radius: 5px;
-      padding:10px;
-      height:50px;
-      position:absolute;
-      margin-top:-25px;
-      margin-left:-400px;
-      top:50%;
-      left:50%;
-      text-align: center;
-      vertical-align: middle;
-      line-height: 50px;
-      font:bold 24px "Lucida Grande", Helvetica, Arial, sans-serif;
-    }
+		#absoluteCenter {
+			width:800px;
+			border-radius: 5px;
+			padding:10px;
+			height:50px;
+			position:absolute;
+			margin-top:-25px;
+			margin-left:-400px;
+			top:50%;
+			left:50%;
+			text-align: center;
+			vertical-align: middle;
+			line-height: 50px;
+			font:bold 24px "Lucida Grande", Helvetica, Arial, sans-serif;
+		}
 
-  </style>
+	</style>
 </html>
