@@ -8,39 +8,56 @@ function parseMaze (map) {
 }
 
 
+function isActive(){
+	return mazeGL.started;
+}
+
+
 var mazeGL = {
 
 	/**
 	 * Initialize
 	 */
+
+	started : false,
+	exec_id : undefined,
+
+
 	init : function ( config ) {
-		this.config = config
-		this.objects = new Object()
-		this.map = new t.Object3D()
+		if( !this.started ){
+
+			this.started = true;
+			this.config = config
+			this.objects = new Object()
+			this.map = new t.Object3D()
 
 
-		// We need a scene
-		this.scene = new t.Scene();
-		//scene.fog = new t.FogExp2(0xD6F1FF, 0.0005);
+			// We need a scene
+			this.scene = new t.Scene();
+			//scene.fog = new t.FogExp2(0xD6F1FF, 0.0005);
 
-		// A camera
-		this.width = 600
-		this.height = 600
-		this.camera = new t.PerspectiveCamera(75, this.width/this.height, 1, 1000)
-		// this.camera = new t.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 1000)
-		this.camera.position = {x: 0, y: 20.5, z: 0}
-		this.camera.lookAt ( {x: 2, y: 1.5, z: -1})
-		// And a renderer
-		this.renderer = new t.WebGLRenderer()
-		this.renderer.setClearColor(new t.Color(0x123466))
-		this.renderer.setSize(this.width, this.height)
-		// this.renderer.setSize(window.innerWidth, window.innerHeight);
-		document.body.appendChild(this.renderer.domElement)
+			// A camera
+			this.width = 600
+			this.height = 600
+			this.camera = new t.PerspectiveCamera(75, this.width/this.height, 1, 1000)
+			// this.camera = new t.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 1000)
+			this.camera.position = {x: 0, y: 20.5, z: 0}
+			this.camera.lookAt ( {x: 2, y: 1.5, z: -1})
+			// And a renderer
+			this.renderer = new t.WebGLRenderer()
+			this.renderer.setClearColor(new t.Color(0x123466))
+			this.renderer.setSize(this.width, this.height)
+			// this.renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(this.renderer.domElement)
 
-		this.addObjects()
-		this.setLights()
-		this.parseMaze()
-		this.render()
+			this.addObjects()
+			this.setLights()
+			this.parseMaze()
+			
+			this.render()
+
+		}
+		
 
 	},
 	
@@ -48,16 +65,21 @@ var mazeGL = {
 	 * Renders the scene.
 	 */
 	render : function () {
+		
 		var self = mazeGL
-		requestAnimationFrame(mazeGL.render)
-
+		this.exec_id = requestAnimationFrame(self.render) // isto tá sempre a gerar um id , pelo que vejo na net nao era suposto chamar isto em cada rendering
 		// Animations
 		self.objects.cube1.rotation.y += 0.01
 		self.objects.cube2.rotation.x += 0.01
 		self.objects.cube3.rotation.z -= 0.01
 		//controls.update();
 		self.renderer.render(self.scene, self.camera)
+		
+		
 	},
+
+
+
 
 	addObjects : function () {
 		var self = mazeGL
@@ -115,6 +137,16 @@ var mazeGL = {
 			}
 		}
 		self.scene.add(self.map)
+	},
+
+	//suposta funcao para parar mas nao funciona
+	stop : function () {
+		if(this.exec_id){
+			this.started = false;
+			window.cancelAnimationFrame(this.exec_id);
+			console.log('webgl stopped');
+       		this.exec_id = undefined;
+		}
 	}
 }
 
