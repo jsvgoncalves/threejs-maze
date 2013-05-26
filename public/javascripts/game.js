@@ -54,6 +54,8 @@ var mazeGL = {
 			this.setLights()
 			this.parseMaze()
 			
+			//this.setUpControls()
+
 			this.render()
 
 		}
@@ -137,6 +139,16 @@ var mazeGL = {
 			}
 		}
 		self.scene.add(self.map)
+	},
+
+	setUpControls: function () {
+		var self = mazeGL
+		// Camera moves with mouse, flies around with WASD/arrow keys
+		self.controls = new t.FirstPersonControls(this.camera); // Handles camera control
+		self.controls.movementSpeed = 100; // How fast the player can walk around
+		self.controls.lookSpeed = 0.075; // How fast the player can look around with the mouse
+		self.controls.lookVertical = false; // Don't allow the player to look up or down. This is a temporary fix to keep people from flying
+		self.controls.noFly = true; // Don't allow hitting R or F to go up or down
 	},
 
 	//suposta funcao para parar mas nao funciona
