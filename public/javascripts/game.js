@@ -21,6 +21,7 @@ var mazeGL = {
 
 	started : false,
 	exec_id : undefined,
+	obstacles : new Array(),
 
 
 	init : function ( config ) {
@@ -43,9 +44,23 @@ var mazeGL = {
 			this.height = window.innerHeight
 			this.camera = new t.PerspectiveCamera(75, this.width/this.height, 1, 1000)
 			// this.camera = new t.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 1000)
-			// this.camera.position = {x: 0, y: 20.5, z: 0}
+			//this.camera.position = {x: 0, y: 20.5, z: 0}
 			// this.camera.lookAt ( {x: 2, y: 1.5, z: -1})
 			// And a renderer
+
+			/// COLISOES
+
+			this.rays = [
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, -1),
+                new THREE.Vector3(-1, 0, 0) 
+        	];
+			this.caster = new t.Raycaster();
+
+
+
+
 			this.renderer = new t.WebGLRenderer()
 			this.renderer.setClearColor(new t.Color(0x123466))
 			this.renderer.setSize(this.width, this.height)
@@ -55,10 +70,11 @@ var mazeGL = {
 			this.attachEvents()
 			this.addObjects()
 			this.setLights()
-			this.parseMaze()
+			
 			this.lockMouse()
 			
 			this.setUpControls()
+			this.parseMaze()
 			this.hideHTML()
 			this.render()
 
@@ -130,10 +146,70 @@ var mazeGL = {
 					pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
 					cube = myCube(dim, pos, 'wall-1.jpg');
 					self.map.add(cube);
+					this.obstacles.push(cube);
+				}else if( maze[i][j] == 2){
+					this.controls.getObject().position.set( i * dim.x - half_x * dim.x, dim.y/2, j * dim.z - half_z * dim.z);
+					//self.camera.position.x = i * dim.x - half_x * dim.x;
+					//self.camera.position.y = dim.y/2 ;
+					//self.camera.position.z = j * dim.z - half_z * dim.z; 
 				}
 			}
 		}
 		self.scene.add(self.map)
+	},
+
+	detectIntersection : function(self){
+		var collisions, i,
+			// Maximum distance from the origin before we consider collision
+			distance = 2;
+			// Get the obstacles array from our world
+			
+		// For each ray
+		for (i = 0; i < this.rays.length; i += 1) {
+			// We reset the raycaster to this direction
+			this.caster.set(this.controls.getObject().position, this.rays[i]);
+			// Test if we intersect with any obstacle mesh
+			collisions = this.caster.intersectObjects(this.obstacles);
+			// And disable that direction if we do
+			
+			if (collisions.length > 0 && collisions[0].distance <= distance) {
+				console.log('COLIDIU com distancia ' + collisions[0].distance);
+				self.controls.reverseMove1 ( true );
+				/*if(i == 0){
+					
+					self.controls.reverseMove1(true);
+				}else if( i == 1){
+					self.controls.reverseMove3(true);
+				}else if( i == 2){
+					self.controls.reverseMove2(true);
+				}else{
+					self.controls.reverseMove4(true);
+					
+				}*/
+
+				/*
+			this.rays = [
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, -1),
+                new THREE.Vector3(-1, 0, 0) 
+        	];*/
+				 // && collisions[0].distance <= distance
+				// Yep, this.rays[i] gives us : 0 => up, 1 => up-left, 2 => left, ...
+				/*if ((i === 0 || i === 1 || i === 7) && this.direction.z === 1) {
+				this.direction.setZ(0);
+				} else if ((i === 3 || i === 4 || i === 5) && this.direction.z === -1) {
+				this.direction.setZ(0);
+				}
+				if ((i === 1 || i === 2 || i === 3) && this.direction.x === 1) {
+				this.direction.setX(0);
+				} else if ((i === 5 || i === 6 || i === 7) && this.direction.x === -1) {
+				this.direction.setX(0);
+				}*/
+				
+			}
+		}
+		
 	},
 
 	setUpControls: function () {
@@ -266,15 +342,22 @@ var mazeGL = {
 	render : function () {
 		
 		var self = mazeGL
-		this.exec_id = requestAnimationFrame(self.render) // isto tá sempre a gerar um id , pelo que vejo na net nao era suposto chamar isto em cada rendering
+		this.exec_id = requestAnimationFrame(self.render) 
 		// Animations
+		self.controls.isOnObject( false );
+		self.controls.reverseMove1 ( false );
 		self.objects.cube1.rotation.y += 0.01
 		self.objects.cube2.rotation.x += 0.01
 		self.objects.cube3.rotation.z -= 0.01
 		//self.controls.update();
 		// self.renderer.render(self.scene, self.camera)
-		console.log(self.controls.getObject().position)
-		self.controls.update( Date.now() - self.time )
+		//console.log(self.controls.getObject().position)
+
+		self.detectIntersection(self)
+
+		self.controls.update( Date.now() - self.time)
+		
+		
 
 		self.renderer.render( self.scene, self.camera )
 
@@ -285,10 +368,11 @@ var mazeGL = {
 	//suposta funcao para parar mas nao funciona
 	stop : function () {
 		if(this.exec_id){
-			this.started = false;
 			window.cancelAnimationFrame(this.exec_id);
+			this.exec_id = undefined;
+			this.started = false;
 			console.log('webgl stopped');
-       		this.exec_id = undefined;
+       		
 		}
 	}
 }

@@ -164,6 +164,7 @@ function start_game_connection(port) {
 						write_error("Unknown error.");
 					break;
 				}
+			disconnect();
 			break;
 			case ID_INFO_SERVER:
 				console.log("received answer: " + parseInt(tokens[1]));

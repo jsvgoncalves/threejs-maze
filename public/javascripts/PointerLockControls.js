@@ -17,6 +17,10 @@ THREE.PointerLockControls = function ( camera ) {
 	var moveBackward = false;
 	var moveLeft = false;
 	var moveRight = false;
+	var reverse1 = false;
+	var reverse2 = false;
+	var reverse3 = false;
+	var reverse4 = false;
 
 	var isOnObject = false;
 	var canJump = false;
@@ -124,8 +128,24 @@ THREE.PointerLockControls = function ( camera ) {
 
 	};
 
-	this.update = function ( delta ) {
+	this.reverseMove1 = function ( boolean ) {
+		reverse1 = boolean;
+	};
 
+	this.reverseMove2 = function ( boolean ) {
+		reverse2 = boolean;
+	};
+
+	this.reverseMove3 = function ( boolean ) {
+		reverse3 = boolean;
+	};
+
+	this.reverseMove4 = function ( boolean ) {
+		reverse4 = boolean;
+	};
+
+	this.update = function ( delta ) {
+		
 		if ( scope.enabled === false ) return;
 
 		delta *= 0.1;
@@ -141,10 +161,29 @@ THREE.PointerLockControls = function ( camera ) {
 		if ( moveLeft ) velocity.x -= SPEED * delta;
 		if ( moveRight ) velocity.x += SPEED * delta;
 
+
+		//if ( reverse1 && moveForward ) velocity.z += 2 *SPEED * delta;
+		//if ( reverse2 && moveBackward ) velocity.z -= 2 *SPEED * delta;
+		//if ( reverse3 && moveLeft ) velocity.x += 2 * SPEED * delta;
+		//if ( reverse4 && moveRight ) velocity.x -= 2 * SPEED * delta;
+
+		//reverse1 = false;
+		//reverse2 = false;
+		//reverse3 = false;
+		//reverse4 = false;
+
 		if ( isOnObject === true ) {
 
 			velocity.y = Math.max( 0, velocity.y );
+			
+			
+		}
 
+		if( reverse1 ){
+			if ( moveForward ) velocity.z += SPEED * delta + 2;
+			if ( moveBackward ) velocity.z -= SPEED * delta + 2;
+			if ( moveLeft ) velocity.x += SPEED * delta + 2;
+			if ( moveRight ) velocity.x -= SPEED * delta + 2;
 		}
 
 		yawObject.translateX( velocity.x );
