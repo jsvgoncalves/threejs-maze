@@ -27,6 +27,9 @@ window.onbeforeunload = function(e){
 
 function start_connection(){
 
+	// map = [[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1]];
+	// parseMaze(map) 
+	// return;
 	host = $('#host').val();
 	port = $('#port').val();
 	player_name = $('#name').val();
@@ -165,7 +168,7 @@ function start_game_connection(port) {
 			case ID_INFO_SERVER:
 				console.log("received answer: " + parseInt(tokens[1]));
 				if(parseInt(tokens[1]) == 0) {
-					write_status("Connected to game");
+					write_status("loading map...");
 					game_socket.send(ID_INFO_GAME.toString() + "\n");
 				} else {
 					write_error("Connection rejected. Try again");

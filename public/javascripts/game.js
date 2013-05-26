@@ -33,7 +33,6 @@ var mazeGL = {
 			this.objects = new Object()
 			this.map = new t.Object3D()
 
-
 			// We need a scene
 			this.scene = new t.Scene();
 			//scene.fog = new t.FogExp2(0xD6F1FF, 0.0005);
@@ -69,7 +68,7 @@ var mazeGL = {
 	},
 
 	hideHTML: function () {
-		$('.absoluteCenter').hide();
+		$('#absoluteCenter').hide();
 	},
 
 	attachEvents: function (){
@@ -77,41 +76,15 @@ var mazeGL = {
 		window.addEventListener( 'resize', self.onWindowResize, false );
 
 	},
-	
-	/**
-	 * Renders the scene.
-	 */
-	render : function () {
-		
-		var self = mazeGL
-		this.exec_id = requestAnimationFrame(self.render) // isto tá sempre a gerar um id , pelo que vejo na net nao era suposto chamar isto em cada rendering
-		// Animations
-		self.objects.cube1.rotation.y += 0.01
-		self.objects.cube2.rotation.x += 0.01
-		self.objects.cube3.rotation.z -= 0.01
-		//self.controls.update();
-		// self.renderer.render(self.scene, self.camera)
-
-		self.controls.update( Date.now() - self.time );
-
-		self.renderer.render( self.scene, self.camera );
-
-		self.time = Date.now();
-
-		
-		
-	},
-
-
-
 
 	addObjects : function () {
 		var self = mazeGL
 
-
 		self.objects.floor = drawFloor()
 		
 		self.scene.add(self.objects.floor);
+		// self.objects.ceiling = drawCeiling()
+		// self.scene.add(self.objects.ceiling);
 		// Now let's add a cube.
 		dim = {x: 1, y: 1, z: 1}, pos = {x: 2, y: 4.5, z: 0}
 		self.objects.cube1 = myCube(dim, pos, 'meme.jpg')
@@ -147,14 +120,14 @@ var mazeGL = {
 			cols = maze.length,
 			half_z = cols / 2,
 			half_x = rows / 2
-
 		dim = {x: 10, y: 20, z: 10}
-		for (var i = 0; i < rows; i++) {
-			for (var j = 0; j < cols; j++) {
+		for (var i = 0; i < cols; i++) {
+			for (var j = 0; j < rows; j++) {
+				// console.log(i + ' ' + j + 'ble -> ' + maze[i][j]);
 				if(maze[i][j] == 0) {
 					// console.log('nothing here')
 				} else if(maze[i][j] == 1) {
-					pos = {x: i * dim.x - half_x * dim.x, y: 1, z: j * dim.z - half_z * dim.z};
+					pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
 					cube = myCube(dim, pos, 'wall-1.jpg');
 					self.map.add(cube);
 				}
@@ -168,10 +141,11 @@ var mazeGL = {
 		self.controls = new t.PointerLockControls( self.camera );
 		// // Camera moves with mouse, flies around with WASD/arrow keys
 		// self.controls = new t.FirstPersonControls(this.camera); // Handles camera control
-		self.controls.movementSpeed = 25; // How fast the player can walk around
+		// self.controls.movementSpeed = 25; // How fast the player can walk around
 		// self.controls.lookSpeed = 0.075; // How fast the player can look around with the mouse
 		// self.controls.lookVertical = false; // Don't allow the player to look up or down. This is a temporary fix to keep people from flying
 		// self.controls.noFly = true; // Don't allow hitting R or F to go up or down
+		// self.scene.add( self.controls );
 		self.scene.add( self.controls.getObject() );
 	},
 
@@ -226,7 +200,7 @@ var mazeGL = {
 			document.addEventListener( 'pointerlockerror', self.pointerlockerror, false );
 			document.addEventListener( 'mozpointerlockerror', self.pointerlockerror, false );
 			document.addEventListener( 'webkitpointerlockerror', self.pointerlockerror, false );
-			console.log('ble -> ' + self.instructions);
+
 			self.instructions.addEventListener( 'click', function ( event ) {
 
 				self.instructions.style.display = 'none';
@@ -285,6 +259,29 @@ var mazeGL = {
 		self.renderer.setSize( window.innerWidth, window.innerHeight );
 
 	},
+
+	/**
+	 * Renders the scene.
+	 */
+	render : function () {
+		
+		var self = mazeGL
+		this.exec_id = requestAnimationFrame(self.render) // isto tá sempre a gerar um id , pelo que vejo na net nao era suposto chamar isto em cada rendering
+		// Animations
+		self.objects.cube1.rotation.y += 0.01
+		self.objects.cube2.rotation.x += 0.01
+		self.objects.cube3.rotation.z -= 0.01
+		//self.controls.update();
+		// self.renderer.render(self.scene, self.camera)
+		console.log(self.controls.getObject().position)
+		self.controls.update( Date.now() - self.time )
+
+		self.renderer.render( self.scene, self.camera )
+
+		self.time = Date.now()
+		
+	},
+
 	//suposta funcao para parar mas nao funciona
 	stop : function () {
 		if(this.exec_id){

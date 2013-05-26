@@ -25,6 +25,12 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var PI_2 = Math.PI / 2;
 
+	var SPEED = 0.1, // Default 0.12
+		SLOWING = 0.20, // Default 0.08
+		JUMPSPEED = 6, // Default 10
+		JUMPSLOWING = 0.75, // Default 0.25
+		JUMPMAX = 140;
+
 	var onMouseMove = function ( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -63,7 +69,7 @@ THREE.PointerLockControls = function ( camera ) {
 				break;
 
 			case 32: // space
-				if ( canJump === true ) velocity.y += 10;
+				if ( canJump === true ) velocity.y += JUMPSPEED;
 				canJump = false;
 				break;
 
@@ -124,16 +130,16 @@ THREE.PointerLockControls = function ( camera ) {
 
 		delta *= 0.1;
 
-		velocity.x += ( - velocity.x ) * 0.08 * delta;
-		velocity.z += ( - velocity.z ) * 0.08 * delta;
+		velocity.x += ( - velocity.x ) * SLOWING * delta;
+		velocity.z += ( - velocity.z ) * SLOWING * delta;
 
-		velocity.y -= 0.25 * delta;
+		velocity.y -= JUMPSLOWING * delta;
 
-		if ( moveForward ) velocity.z -= 0.12 * delta;
-		if ( moveBackward ) velocity.z += 0.12 * delta;
+		if ( moveForward ) velocity.z -= SPEED * delta;
+		if ( moveBackward ) velocity.z += SPEED * delta;
 
-		if ( moveLeft ) velocity.x -= 0.12 * delta;
-		if ( moveRight ) velocity.x += 0.12 * delta;
+		if ( moveLeft ) velocity.x -= SPEED * delta;
+		if ( moveRight ) velocity.x += SPEED * delta;
 
 		if ( isOnObject === true ) {
 
@@ -152,7 +158,15 @@ THREE.PointerLockControls = function ( camera ) {
 
 			canJump = true;
 
-		}
+		} 
+
+		if ( yawObject.position.y > JUMPMAX ) {
+			
+			velocity.y = 0;
+			yawObject.position.y = JUMPMAX;
+
+		} 
+
 
 	};
 
