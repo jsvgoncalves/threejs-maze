@@ -71,6 +71,10 @@ function start_connection(){
 			}
 		};
 
+		socket.onerror = function (evt) {
+			write_status('Oops! Failed to connect.');
+		}
+
 		socket.onclose = function() { 
 			// websocket is closed.
 			server_connected = false;
@@ -138,7 +142,7 @@ function start_game_connection(port) {
 	game_socket.onmessage = function(evt) {
 		message = evt.data;
 		
-		console.log('message received from game: ' + message);
+		//console.log('message received from game: ' + message);
 		var tokens = message.split(delim);
 
 		switch(parseInt(tokens[0])) {
@@ -185,7 +189,7 @@ function start_game_connection(port) {
 			break;
 				case ID_INFO_MAP:
 				var map = jQuery.parseJSON(tokens[1]);
-				console.log("received map: " + JSON.stringify(map));
+				//console.log("received map: " + JSON.stringify(map));
 
 				/**----------------------------------------------------------------------------------------------------------------
 				aqui recebes o mapa. defines ele no teu ambiente webgl
