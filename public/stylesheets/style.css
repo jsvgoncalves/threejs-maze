@@ -40,3 +40,33 @@ a {
   margin: 0 auto;
   text-align: center;
 }
+#info-tab {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  display: none;
+  position: absolute;
+  color: #7383c9;
+  font-size: 16px;
+  background-color: rgba(1,1,1,0.5);
+  border: 1px solid rgba(1,1,1,0.5);
+  margin-left: 150px;
+  margin-top: 150px;
+  padding: 5px;
+  float: left;
+  min-width: 500px;
+  min-height: 300px;
+}
+#info-player {
+  display: none;
+  position: absolute;
+  color: #7383c9;
+  font-size: 16px;
+  background-color: rgba(1,1,1,0.5);
+  border: 1px solid #808080;
+  margin-right: 0px;
+  margin-top: 2px;
+  padding: 5px;
+  float: right;
+}

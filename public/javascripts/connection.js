@@ -11,14 +11,14 @@ $errorp = null;
 
 
 window.onbeforeunload = function(e){
-	console.log("closing");
+	// console.log("closing");
 	write_status("closing connection...");
 	if(server_connected && socket != null) {
 		socket.close();
 	}
 
 	if(game_connected && game_socket != null) {
-		console.log("desliga o socket de jogo");
+		// console.log("desliga o socket de jogo");
 		game_socket.close();
 	}
 
@@ -46,10 +46,10 @@ function start_connection(){
 	//var socket = io.connect('', {'resource': '/chat'});
 
 	if ("WebSocket" in window) {
-		console.log("WebSocket is supported by your Browser!");
+		// console.log("WebSocket is supported by your Browser!");
 		// Let us open a web socket
 		write_status("connecting...");
-		console.log("ws://" + host + ":" + port + "/server");
+		// console.log("ws://" + host + ":" + port + "/server");
 		socket = new WebSocket("ws://" + host + ":" + port + "/server");
 		socket.onopen = function() {
 			server_connected = true;
@@ -62,7 +62,7 @@ function start_connection(){
 			var received_msg = evt.data;
 
 			var tokens = received_msg.split(delim);
-			console.log('message received: ' + received_msg);
+			// console.log('message received: ' + received_msg);
 			if(tokens.length == 2) {
 				game_port = parseInt(tokens[1]);
 				if( game_port == -1) {
@@ -81,12 +81,12 @@ function start_connection(){
 		socket.onclose = function() { 
 			// websocket is closed.
 			server_connected = false;
-			console.log("Connection is closed..."); 
+			// console.log("Connection is closed..."); 
 		};
 	} else {
 		// The browser doesn't support WebSocket
 		reset();
-		console.log("WebSocket NOT supported by your Browser!");
+		// console.log("WebSocket NOT supported by your Browser!");
 
 		if(!game_started) {
 			reset();
@@ -125,14 +125,14 @@ var GAME_STATUS_INIT = 0,
 	*/
 
 function start_game_connection(port) {
-	console.log('connecting to game in port ' + game_port);
+	// console.log('connecting to game in port ' + game_port);
 	write_status("connecting to game...");
 	//console.log("ws://" + host + ":" + game_port + "/labyrinth");
 	game_socket = new WebSocket("ws://" + host + ":" + game_port + "/labyrinth");
 
 	game_socket.onopen = function() {
 		game_connected = true;
-		console.log('ligado ao jogo');
+		// console.log('ligado ao jogo');
 		game_socket.send(ID_PLAYER_INFO.toString() + delim + "0" + delim + "1" + delim + player_name + "\n");
 
 		/*
@@ -152,7 +152,7 @@ function start_game_connection(port) {
 			case ID_INFO_EXIT:
 				switch(parseInt(tokens[1])) {
 					case ID_ERROR_NAME_DUPLICATE:
-						write_error("Name Allready in use. Please use another one or retry again");
+						write_error("Name Already in use. Please use another one or retry again");
 					break;
 					case ID_ERROR_INVALID_PARAMS:
 						write_error("Invalid params or invalid communication between client and server. Refresh your browser or try again");
@@ -167,7 +167,7 @@ function start_game_connection(port) {
 			disconnect();
 			break;
 			case ID_INFO_SERVER:
-				console.log("received answer: " + parseInt(tokens[1]));
+				// console.log("received answer: " + parseInt(tokens[1]));
 				if(parseInt(tokens[1]) == 0) {
 					write_status("loading map...");
 					game_socket.send(ID_INFO_GAME.toString() + "\n");
@@ -180,19 +180,22 @@ function start_game_connection(port) {
 			break;
 			case ID_INFO_GAME_STATUS:
 				var game_status = parseInt(tokens[1]),
-				player_status = parseInt(tokens[2]),
-				info_players = jQuery.parseJSON(tokens[3]);
-				console.log("info players received: " + JSON.stringify(info_players));
-				console.log("game state : " + game_status + " player status: " + player_status);
+				player_status = parseInt(tokens[2]);
+				var info_players = jQuery.parseJSON(tokens[3]);
+				// console.log("info players received: " + JSON.stringify(info_players));
+				// console.log("game state : " + game_status + " player status: " + player_status);
 
 				/**----------------------------------------------------------------------------------------------------------------
 				aqui fazes alocaçao da informação recebida como determinar se o jogo acabou ou se um existe jogadores novos, etc etc 
 				**/
+				console.log('updated players');
+				console.log(info_players);
 				updateStatus(info_players);
 
 			break;
 				case ID_INFO_MAP:
 				var map = jQuery.parseJSON(tokens[1]);
+				// console.log('recebi um mapa')
 				//console.log("received map: " + JSON.stringify(map));
 
 				/**----------------------------------------------------------------------------------------------------------------
@@ -207,10 +210,11 @@ function start_game_connection(port) {
 				coordsx = parseFloat(tokens[3]);
 				coordsy = parseFloat(tokens[4]);
 				coordsz = parseFloat(tokens[5]);
-				console.log('update ' + name + ' x:' + coordsx + ' y:' + coordsy + ' z:' + coordsz);
+				// console.log('update ' + name + ' x:' + coordsx + ' y:' + coordsy + ' z:' + coordsz);
 				/**----------------------------------------------------------------------------------------------------------------
 				aqui recebes update de um player fazes update da sua posiçao e do seu estado
 				**/
+				Players.updatePlayer(name, coordsx, coordsy, coordsz, status);
 			break;
 			default:
 			break;
@@ -224,7 +228,7 @@ function start_game_connection(port) {
 
 
 		game_socket.onclose = function() {
-			console.log("game connection closed");
+			// console.log("game connection closed");
 			write_error("game connection closed");
 			reset();
 			/*
@@ -246,6 +250,7 @@ function reset(){
 	$form.show();
 	$status.hide();
 	$status.html("");
+	MazeGL.stop();
 }
 
 function write_error(msg)
