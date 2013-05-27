@@ -204,10 +204,12 @@ function start_game_connection(port) {
 			case ID_UPDATE_PLAYER:
 				var name = tokens[1],
 				status = parseInt(tokens[2]),
-				coords = tokens[3].replace("[", "").replace("]","").split(",");
-
+				coordsx = parseFloat(tokens[3]);
+				coordsy = parseFloat(tokens[4]);
+				coordsz = parseFloat(tokens[5]);
+				console.log('update ' + name + ' x:' + coordsx + ' y:' + coordsy + ' z:' + coordsz);
 				/**----------------------------------------------------------------------------------------------------------------
-				aqui recebes update de um player , deves verificar se ele existe ,caso nao existe adicionas, fazes update da sua posiçao e do seu estado
+				aqui recebes update de um player fazes update da sua posiçao e do seu estado
 				**/
 			break;
 			default:
@@ -262,5 +264,5 @@ function disconnect(){
 }
 
 function sendPosition(x, y, z) {
-	game_socket.send(ID_UPDATE_PLAYER.toString() + delim + x + delim + y + delim + z+ "\n");
+	game_socket.send(ID_INFO_PLAYER.toString() + delim + x.toString() + delim + y.toString() + delim + z.toString() + "\n");
 }

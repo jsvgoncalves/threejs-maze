@@ -427,9 +427,9 @@ var MazeGL = {
 		// console.log(self.controls.getObject().position)
 		self.playerElement.innerHTML = playerHTML;
 		sendPosition(
-			((self.controls.getObject().position.x)/10),
-			((self.controls.getObject().position.y)/10),
-			((self.controls.getObject().position.z)/10));
+			((self.controls.getObject().position.x)/10.0),
+			((self.controls.getObject().position.y)/10.0),
+			((self.controls.getObject().position.z)/10.0));
 
 		self.renderer.render( self.scene, self.camera )
 
