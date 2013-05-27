@@ -180,10 +180,10 @@ THREE.PointerLockControls = function ( camera ) {
 		}
 
 		if( reverse1 ){
-			if ( moveForward ) velocity.z += SPEED * delta + 2;
-			if ( moveBackward ) velocity.z -= SPEED * delta + 2;
-			if ( moveLeft ) velocity.x += SPEED * delta + 2;
-			if ( moveRight ) velocity.x -= SPEED * delta + 2;
+			if ( moveForward ) velocity.z = 0;
+			if ( moveBackward ) velocity.z = 0;
+			if ( moveLeft ) velocity.x = 0;
+			if ( moveRight ) velocity.x = 0;
 		}
 
 		yawObject.translateX( velocity.x );

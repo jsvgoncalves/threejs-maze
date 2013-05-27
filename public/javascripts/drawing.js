@@ -8,7 +8,7 @@ function myCube(dim, pos, color) {
 	//var cube_material = new t.MeshBasicMaterial({color: color});
 	var cube_material = new t.MeshLambertMaterial({map: t.ImageUtils.loadTexture('images/' + color)});
 	var cube = new t.Mesh(cube_geometry, cube_material);
-	cube.position = {x: pos.x, y: pos.y, z: pos.z};
+	cube.position = {x: pos.x + dim.x / 2, y: pos.y, z: pos.z + dim.z / 2};
 	return cube;
 }
 

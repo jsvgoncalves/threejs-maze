@@ -1,19 +1,37 @@
 var t = THREE
 
+function updateStatus (players) {
+	console.log('updateStatus() {')
+	console.log(players)
+	console.log('}')
+	Players.update(players)
+
+}
+
+var Players = {
+	init: function (config) {
+
+	},
+
+	update: function (players) {
+		this.players = players
+	}
+}
+
 function parseMaze (map) {
 	// body...
 	// console.log('I got the map' + JSON.stringify(map));
-	// var maze = new mazeGL();
-	mazeGL.init({maze: map})
+	// var maze = new MazeGL();
+	MazeGL.init({maze: map})
 }
 
 
 function isActive(){
-	return mazeGL.started;
+	return MazeGL.started;
 }
 
 
-var mazeGL = {
+var MazeGL = {
 
 	/**
 	 * Initialize
@@ -33,7 +51,8 @@ var mazeGL = {
 			this.config = config
 			this.objects = new Object()
 			this.map = new t.Object3D()
-
+			this.infoElement = document.getElementById( 'info-tab' )
+			this.playerElement = document.getElementById( 'info-player' )
 			// We need a scene
 			this.scene = new t.Scene();
 			//scene.fog = new t.FogExp2(0xD6F1FF, 0.0005);
@@ -88,13 +107,37 @@ var mazeGL = {
 	},
 
 	attachEvents: function (){
-		var self = mazeGL
-		window.addEventListener( 'resize', self.onWindowResize, false );
+		var self = MazeGL
+		window.addEventListener( 'resize', self.onWindowResize, false )
+		window.addEventListener( 'keypress', self.showInfo, false )
+		window.addEventListener( 'keyup', self.hideInfo, false )
+
+		// $('body').live('keydown', self.showInfo) 
 
 	},
 
+	showInfo: function (evt) {
+		var keyCode = evt.keyCode || evt.which,
+			self = MazeGL; 
+
+		if (keyCode == 9) {
+			self.infoElement.style.display = 'inline';
+			evt.preventDefault(); 
+		} 
+	},
+
+	hideInfo: function (evt) {
+		var keyCode = evt.keyCode || evt.which,
+			self = MazeGL; 
+
+		if (keyCode == 9) {
+			self.infoElement.style.display = 'none';
+			evt.preventDefault(); 
+		} 
+	},
+
 	addObjects : function () {
-		var self = mazeGL
+		var self = MazeGL
 
 		self.objects.floor = drawFloor()
 		
@@ -102,15 +145,15 @@ var mazeGL = {
 		// self.objects.ceiling = drawCeiling()
 		// self.scene.add(self.objects.ceiling);
 		// Now let's add a cube.
-		dim = {x: 1, y: 1, z: 1}, pos = {x: 2, y: 4.5, z: 0}
+		dim = {x: 30, y: 30, z: 30}, pos = {x: 70, y: 130, z: 0}
 		self.objects.cube1 = myCube(dim, pos, 'meme.jpg')
 		self.scene.add(self.objects.cube1)
 		// And another cube.
-		dim = {x: 1, y: 1, z: 1}, pos = {x: -2, y: 4.5, z: 0}
+		dim = {x: 30, y: 30, z: 30}, pos = {x: -50, y: 130, z: 10}
 		self.objects.cube2 = myCube(dim, pos, 'trololo.jpg')
 		self.scene.add(self.objects.cube2)
 		// And another cube.
-		dim = {x: 1, y: 1, z: 1}, pos = {x: 0, y: 5, z: -3}
+		dim = {x: 30, y: 30, z: 30}, pos = {x: 10, y: 100, z: -13}
 		self.objects.cube3 = myCube(dim, pos, 'wall-1.jpg')
 		self.scene.add(self.objects.cube3)
 	},
@@ -130,7 +173,7 @@ var mazeGL = {
 	},
 
 	parseMaze: function () {
-		var self = mazeGL,
+		var self = MazeGL,
 			maze = self.config.maze,
 			rows = maze[0].length,
 			cols = maze.length,
@@ -143,15 +186,20 @@ var mazeGL = {
 				if(maze[i][j] == 0) {
 					// console.log('nothing here')
 				} else if(maze[i][j] == 1) {
-					pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
+					// pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
+					pos = {x: i * dim.x, y: dim.y/2, z: j * dim.z};
 					cube = myCube(dim, pos, 'wall-1.jpg');
 					self.map.add(cube);
 					this.obstacles.push(cube);
 				}else if( maze[i][j] == 2){
-					this.controls.getObject().position.set( i * dim.x - half_x * dim.x, dim.y/2, j * dim.z - half_z * dim.z);
+					this.controls.getObject().position.set( i * dim.x, dim.y/2, j * dim.z);
 					//self.camera.position.x = i * dim.x - half_x * dim.x;
 					//self.camera.position.y = dim.y/2 ;
 					//self.camera.position.z = j * dim.z - half_z * dim.z; 
+				} else if( maze[i][j] == 3) {
+					// Saida
+					pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
+					// self.map.add(drawExit(pos));
 				}
 			}
 		}
@@ -173,7 +221,7 @@ var mazeGL = {
 			// And disable that direction if we do
 			
 			if (collisions.length > 0 && collisions[0].distance <= distance) {
-				console.log('COLIDIU com distancia ' + collisions[0].distance);
+				// console.log('COLIDIU com distancia ' + collisions[0].distance);
 				self.controls.reverseMove1 ( true );
 				/*if(i == 0){
 					
@@ -213,7 +261,7 @@ var mazeGL = {
 	},
 
 	setUpControls: function () {
-		var self = mazeGL
+		var self = MazeGL
 		self.controls = new t.PointerLockControls( self.camera );
 		// // Camera moves with mouse, flies around with WASD/arrow keys
 		// self.controls = new t.FirstPersonControls(this.camera); // Handles camera control
@@ -226,17 +274,17 @@ var mazeGL = {
 	},
 
 	pointerlockchange : function ( event ) {
-		var self = mazeGL,
+		var self = MazeGL,
 			element = self.element
 
 		if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
 
 			self.controls.enabled = true;
 
+			self.playerElement.style.display = 'inline';
 			self.blocker.style.display = 'none';
 
 		} else {
-			console.log('i no have it now!')
 			self.controls.enabled = false;
 
 			self.blocker.style.display = '-webkit-box';
@@ -245,20 +293,23 @@ var mazeGL = {
 
 			self.blocker.style.display = 'inline';
 			self.instructions.style.display = 'inline';
+			self.playerElement.style.display = 'inline';
+			// self.infoElement.style.display = 'inline';
 
 		}
 	},
 
 	pointerlockerror : function ( event ) {
-		console.log('error pointer');
-		var self = mazeGL
+		var self = MazeGL
 		self.instructions.style.display = 'inline';
+		// self.infoElement.style.display = 'inline';
+		self.playerElement.style.display = 'inline';
 		self.blocker.style.display = 'inline';
 
 	},
 
 	lockMouse: function () {
-		var self = mazeGL
+		var self = MazeGL
 		self.showLockRequest()
 
 		self.blocker = document.getElementById( 'blocker' )
@@ -321,14 +372,14 @@ var mazeGL = {
 	},
 
 	showLockRequest: function() {
-		var self = mazeGL
+		var self = MazeGL
 		// self.instructions = document.getElementById( 'instructions' )
 		$('#blocker').show()
 		// $('#instructions').show()
 	},
 
 	onWindowResize: function () {
-		var self = mazeGL
+		var self = MazeGL
 		self.camera.aspect = window.innerWidth / window.innerHeight;
 		self.camera.updateProjectionMatrix();
 
@@ -341,7 +392,7 @@ var mazeGL = {
 	 */
 	render : function () {
 		
-		var self = mazeGL
+		var self = MazeGL
 		this.exec_id = requestAnimationFrame(self.render) 
 		// Animations
 		self.controls.isOnObject( false );
@@ -356,8 +407,29 @@ var mazeGL = {
 		self.detectIntersection(self)
 
 		self.controls.update( Date.now() - self.time)
-		
-		
+
+		// Set the info Div.
+		var players = Players.players,
+			keys = Object.keys( players ),
+			infoHTML = ''
+		for (var i = keys.length - 1; i >= 0; i--) {
+			infoHTML += keys[i] + ' <' + players[keys[i]].coord + '><br>'
+		}
+		self.infoElement.innerHTML =  infoHTML
+	
+		playerHTML = 
+			'x: ' + ((self.controls.getObject().position.x)/10) + '<br>' +
+			'x: ' + parseInt((self.controls.getObject().position.x)/10.0) + '<br>' +
+			'z: ' + ((self.controls.getObject().position.z)/10) + '<br>' +
+			'z: ' + parseInt((self.controls.getObject().position.z)/10.0) + '<br>' +
+			'y: ' + self.controls.getObject().position.y;
+
+		// console.log(self.controls.getObject().position)
+		self.playerElement.innerHTML = playerHTML;
+		sendPosition(
+			((self.controls.getObject().position.x)/10),
+			((self.controls.getObject().position.y)/10),
+			((self.controls.getObject().position.z)/10));
 
 		self.renderer.render( self.scene, self.camera )
 

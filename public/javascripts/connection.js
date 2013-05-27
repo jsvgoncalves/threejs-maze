@@ -188,7 +188,7 @@ function start_game_connection(port) {
 				/**----------------------------------------------------------------------------------------------------------------
 				aqui fazes alocaçao da informação recebida como determinar se o jogo acabou ou se um existe jogadores novos, etc etc 
 				**/
-
+				updateStatus(info_players);
 
 			break;
 				case ID_INFO_MAP:
@@ -259,4 +259,8 @@ function disconnect(){
 		game_socket.close();
 		reset();
 	}
+}
+
+function sendPosition(x, y, z) {
+	game_socket.send(ID_UPDATE_PLAYER.toString() + delim + x + delim + y + delim + z+ "\n");
 }
