@@ -54,6 +54,8 @@ var MazeGL = {
 	started : false,
 	exec_id : undefined,
 	obstacles : new Array(),
+	map_loaded : false,
+	oldMaze : undefined,
 
 	prepare: function () {
 		this.players = new Object();
@@ -112,8 +114,13 @@ var MazeGL = {
 			this.setUpControls()
 			this.parseMaze()
 			this.hideHTML()
-			this.render()
+			//this.render();
+			this.start()
 
+		}else{
+			this.oldMaze = this.config.maze;
+			this.config = config;
+			this.parseMaze()
 		}
 		
 
@@ -213,6 +220,18 @@ var MazeGL = {
 			half_z = rows / 2,
 			half_x = cols / 2;
 
+		/* reset do mapa */
+		if ( self.map_loaded ) { 
+			self.scene.remove( self.map );
+			this.obstacles.length = 0;	
+			self.map = new t.Object3D();
+
+		}else{
+			self.map_loaded = true;
+		}
+		/////////////////////////////////////////////////////////
+
+
 		dim = {x: 10, y: 20, z: 10};
 		for (var j = 0; j < cols; j++) {
 			buh = ''
@@ -229,7 +248,8 @@ var MazeGL = {
 					this.obstacles.push(cube);
 					buh += '1'
 				}else if( maze[j][i] == 2){
-					this.controls.getObject().position.set( -(j * dim.x + dim.x / 2), dim.y/2, -(i * dim.z + dim.z / 2));
+					//this.controls.getObject().position.set( -(j * dim.x + dim.x / 2), dim.y/2, -(i * dim.z + dim.z / 2)); ao contario 
+					this.controls.getObject().position.set( -(i * dim.z + dim.z / 2), dim.y/2,  -(j * dim.x + dim.x / 2));
 					//self.camera.position.x = i * dim.x - half_x * dim.x;
 					//self.camera.position.y = dim.y/2 ;
 					buh += '2'
@@ -255,18 +275,132 @@ var MazeGL = {
 			// Maximum distance from the origin before we consider collision
 			distance = 2;
 			// Get the obstacles array from our world
-			
+
+		////////////// implementação das 4 direcçoes tendo em conta a direcçao do jogador . 
+		//var vector = new THREE.Vector3( 0, 0, -1 );	
+
+
+		//vector = vector.applyEuler( self.controls.getObject().rotation, self.controls.getObject().eulerOrder );  // aplica transformação da camara no vector , assim obtemos o vector para onde a camara está apontando. 
+		//vector = Quaternion.Euler(self.controls.getObject().rotation.x, -45,self.controls.getObject().rotation.z ) * vector;
+		//vector.x = - vector.x;
+		//vector.z = - vector.z;
+		/*var tempR = [
+				new THREE.Vector3(vector.x, 0, vector.z),
+                new THREE.Vector3(-vector.x, 0, vector.z),
+                new THREE.Vector3(vector.x, 0, -vector.z),
+                new THREE.Vector3(-vector.x, 0, -vector.z) 
+        ];*/
+		//console.log("direction x:" + vector.x + " y:" + vector.y + " z:" + vector.z);
+		/*var direction;
+		if(vector.x >= 0 && vector.z >= 0){
+			direction = 1;
+		}else if( vector.x < 0 && vector.z >= 0 )
+		{
+			direction = 3;
+		}else if( vector.x >= 0 && vector.z < 0 )
+		{
+			direction = 0;
+		}else{
+			direction = 2;
+		}*/
+		//tempR.push([vector.x,0,vector.z]);
+		//tempR.push([-vector.x,0,vector.z]);
+		//tempR.push([vector.x,0,-vector.z]);
+		//tempR.push([-vector.x,0,-vector.z]);
+
+
+		//tempR.push(vector.toArray());
 		// For each ray
-		for (i = 0; i < this.rays.length; i += 1) {
+		for (i = 0; i < this.rays.length; i += 1) {  // this.rays
 			// We reset the raycaster to this direction
-			this.caster.set(this.controls.getObject().position, this.rays[i]);
+			this.caster.set(this.controls.getObject().position, this.rays[i]); // this.rays[i]
 			// Test if we intersect with any obstacle mesh
 			collisions = this.caster.intersectObjects(this.obstacles);
 			// And disable that direction if we do
 			
-			if (collisions.length > 0 && collisions[0].distance <= distance) {
+			if (collisions.length > 0){
+				
+				if(collisions[0].distance <= distance){
+					self.controls.reverseMove1 ( true );
+					//self.controls.reverseMove3 ( true );
+
+
+					/*if( (i == 0 && direction == 0) || (i == 0 && direction == 1) || (i == 0 && direction == 2) || (i == 0 && direction == 3)){
+						self.controls.reverseMove1 ( true );
+					}
+
+					if( ( i == 1 && direction == 0 ) || ( i == 1 && direction == 1) || (i == 1 && direction == 2) || (i == 1 && direction == 3)){
+						self.controls.reverseMove4 ( true );
+					}
+
+					if ( (i == 2 && direction == 0) || (i == 2 && direction == 1) || (i == 2 && direction == 2) || (i == 2 && direction == 3) ){
+						self.controls.reverseMove2 ( true );
+					}
+
+					if( (i == 3 && direction == 0) || (i == 3 && direction == 1) || ( i == 3 && direction == 2) || (i == 3 && direction == 3) ){
+						self.controls.reverseMove3 ( true );
+					}*/
+					/*if ( i == 0 ){
+						if(tempR[i].x >= 0)
+						{
+							
+							self.controls.reverseMove3 ( true );
+						}else{
+							self.controls.reverseMove4 ( true );
+							
+						}
+
+						if(tempR[i].z >= 0){
+							
+							self.controls.reverseMove2 ( true );
+						}else{
+							self.controls.reverseMove1 ( true );
+							
+						}
+					}else if( i == 1){
+						if(tempR[i].x >= 0)
+						{
+							
+							self.controls.reverseMove3 ( true );
+						}else{
+							self.controls.reverseMove4 ( true );
+							
+						}
+
+						if(tempR[i].z >= 0){
+							
+							self.controls.reverseMove2 ( true );
+						}else{
+							self.controls.reverseMove1 ( true );
+							
+						}
+					}else if(i == 2){
+
+					}else{
+
+					}*/
+					/*if(tempR[i].x >= 0)
+					{
+						console.log('bloqueio +x');
+						self.controls.reverseMove3 ( true );
+					}else{
+						self.controls.reverseMove4 ( true );
+						console.log('bloqueio -x');
+					}
+
+					if(tempR[i].z >= 0){
+						console.log('bloqueio +z');
+						self.controls.reverseMove2 ( true );
+					}else{
+						self.controls.reverseMove1 ( true );
+						console.log('bloqueio -z');
+					}*/
+
+					
+				}
+			} 
 				// console.log('COLIDIU com distancia ' + collisions[0].distance);
-				self.controls.reverseMove1 ( true );
+				
 				/*if(i == 0){
 					
 					self.controls.reverseMove1(true);
@@ -298,9 +432,9 @@ var MazeGL = {
 				} else if ((i === 5 || i === 6 || i === 7) && this.direction.x === -1) {
 				this.direction.setX(0);
 				}*/
-				
-			}
-		}
+		}		
+			
+		
 		
 	},
 
@@ -444,10 +578,10 @@ var MazeGL = {
 			x = Math.abs(pos.x);
 			y = Math.abs(pos.y);
 			z = Math.abs(pos.z);
-
-		this.exec_id = requestAnimationFrame(self.render) 
+		//console.log("processando");
+		this.exec_id = window.requestAnimationFrame(self.render); 
 		self.controls.isOnObject( false );
-		self.controls.reverseMove1 ( false );
+		//self.controls.reverseMove1 ( false );
 		self.detectIntersection(self)
 
 		// Animations
@@ -499,6 +633,12 @@ var MazeGL = {
 		
 	},
 
+	start : function () {
+		if (!self.exec_id) {
+       		MazeGL.render();
+    	}
+	},
+
 	stop : function () {
 		var self = MazeGL;
 		if(self.exec_id){
@@ -509,8 +649,16 @@ var MazeGL = {
 			self.instructions.style.display = 'none';
 			// self.infoElement.style.
 			// window.body.removeChild(game.renderer.domElement); //Remove the renderer from the div
-			self.renderer.setSize(0, 0); //I guess this isn't needed, but welp
+			//self.renderer.setSize(0, 0); //I guess this isn't needed, but welp
 			window.cancelAnimationFrame(self.exec_id);
+			//self.scene.dispose();
+			//self.map.dispose();
+			//self.scene.remove( self.map );
+
+			//geometry.dispose();
+			//texture.dispose();
+			//material.dispose();
+			//self.players.dispose();
 			self.exec_id = undefined;
 			self.started = false;
 			console.log('webgl stopped');

@@ -41,7 +41,7 @@ THREE.PointerLockControls = function ( camera ) {
 
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
+		//console.log('movimento x: ' + movementX + ' y:' + movementY);
 		yawObject.rotation.y -= movementX * 0.002;
 		pitchObject.rotation.x -= movementY * 0.002;
 
@@ -167,10 +167,7 @@ THREE.PointerLockControls = function ( camera ) {
 		//if ( reverse3 && moveLeft ) velocity.x += 2 * SPEED * delta;
 		//if ( reverse4 && moveRight ) velocity.x -= 2 * SPEED * delta;
 
-		//reverse1 = false;
-		//reverse2 = false;
-		//reverse3 = false;
-		//reverse4 = false;
+		
 
 		if ( isOnObject === true ) {
 
@@ -179,12 +176,21 @@ THREE.PointerLockControls = function ( camera ) {
 			
 		}
 
+		//if ( ( reverse1 && moveForward ) || ( reverse2 && moveBackward) ) velocity.z = 0;
+		//if ( ( reverse3 && moveLeft ) || ( reverse4 && moveRight ) ) velocity.x = 0;
+
 		if( reverse1 ){
 			if ( moveForward ) velocity.z = 0;
 			if ( moveBackward ) velocity.z = 0;
 			if ( moveLeft ) velocity.x = 0;
 			if ( moveRight ) velocity.x = 0;
 		}
+		reverse1 = false;
+		reverse2 = false;
+		reverse3 = false;
+		reverse4 = false;
+
+		
 
 		yawObject.translateX( velocity.x );
 		yawObject.translateY( velocity.y ); 
