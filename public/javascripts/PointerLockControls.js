@@ -179,7 +179,7 @@ THREE.PointerLockControls = function ( camera ) {
 		//if ( ( reverse1 && moveForward ) || ( reverse2 && moveBackward) ) velocity.z = 0;
 		//if ( ( reverse3 && moveLeft ) || ( reverse4 && moveRight ) ) velocity.x = 0;
 
-		if( reverse1 ){
+		if( reverse1 || reverse2 || reverse3 || reverse4 ){
 			if ( moveForward ) velocity.z = 0;
 			if ( moveBackward ) velocity.z = 0;
 			if ( moveLeft ) velocity.x = 0;

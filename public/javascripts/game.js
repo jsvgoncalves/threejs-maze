@@ -273,36 +273,55 @@ var MazeGL = {
 	detectIntersection : function(self){
 		var collisions, i,
 			// Maximum distance from the origin before we consider collision
-			distance = 2;
+			distance = 3;
 			// Get the obstacles array from our world
 
 		////////////// implementação das 4 direcçoes tendo em conta a direcçao do jogador . 
-		//var vector = new THREE.Vector3( 0, 0, -1 );	
+		var vector = new THREE.Vector3( 0, 0, -1 );	
 
 
-		//vector = vector.applyEuler( self.controls.getObject().rotation, self.controls.getObject().eulerOrder );  // aplica transformação da camara no vector , assim obtemos o vector para onde a camara está apontando. 
+		vector = vector.applyEuler( self.controls.getObject().rotation, self.controls.getObject().eulerOrder );  // aplica transformação da camara no vector , assim obtemos o vector para onde a camara está apontando. 
 		//vector = Quaternion.Euler(self.controls.getObject().rotation.x, -45,self.controls.getObject().rotation.z ) * vector;
 		//vector.x = - vector.x;
 		//vector.z = - vector.z;
-		/*var tempR = [
-				new THREE.Vector3(vector.x, 0, vector.z),
-                new THREE.Vector3(-vector.x, 0, vector.z),
-                new THREE.Vector3(vector.x, 0, -vector.z),
-                new THREE.Vector3(-vector.x, 0, -vector.z) 
-        ];*/
+		var tempR;
 		//console.log("direction x:" + vector.x + " y:" + vector.y + " z:" + vector.z);
-		/*var direction;
-		if(vector.x >= 0 && vector.z >= 0){
+		var direction;
+		if(vector.x >= 0 && vector.z < 0){
+			direction = 0;
+			tempR = [
+				new THREE.Vector3(vector.x, 0, vector.z),
+                new THREE.Vector3(vector.z, 0, -vector.x),
+                new THREE.Vector3(-vector.x, 0, -vector.z),
+                new THREE.Vector3(-vector.z, 0, vector.x) 
+       		];
+		}else if( vector.x >= 0 && vector.z >= 0 )
+		{
 			direction = 1;
+			tempR = [
+				new THREE.Vector3(vector.x, 0, vector.z),
+                new THREE.Vector3(-vector.z, 0, vector.x),
+                new THREE.Vector3(-vector.x, 0, -vector.z),
+                new THREE.Vector3(vector.z, 0, -vector.x) 
+       		];
 		}else if( vector.x < 0 && vector.z >= 0 )
 		{
-			direction = 3;
-		}else if( vector.x >= 0 && vector.z < 0 )
-		{
-			direction = 0;
-		}else{
 			direction = 2;
-		}*/
+			tempR = [
+				new THREE.Vector3(vector.x, 0, vector.z),
+                new THREE.Vector3(vector.z, 0, -vector.x),
+                new THREE.Vector3(-vector.x, 0, -vector.z),
+                new THREE.Vector3(-vector.z, 0, vector.x) 
+       		];
+		}else{
+			direction = 3;
+			tempR = [
+				new THREE.Vector3(vector.x, 0, vector.z),
+                new THREE.Vector3(-vector.z, 0, vector.x),
+                new THREE.Vector3(-vector.x, 0, -vector.z),
+                new THREE.Vector3(vector.z, 0, -vector.x) 
+       		];
+		}
 		//tempR.push([vector.x,0,vector.z]);
 		//tempR.push([-vector.x,0,vector.z]);
 		//tempR.push([vector.x,0,-vector.z]);
@@ -311,35 +330,54 @@ var MazeGL = {
 
 		//tempR.push(vector.toArray());
 		// For each ray
-		for (i = 0; i < this.rays.length; i += 1) {  // this.rays
+		for (i = 0; i < tempR.length; i += 1) {  // this.rays
 			// We reset the raycaster to this direction
-			this.caster.set(this.controls.getObject().position, this.rays[i]); // this.rays[i]
+			this.caster.set(this.controls.getObject().position, tempR[i]); // this.rays[i]
 			// Test if we intersect with any obstacle mesh
 			collisions = this.caster.intersectObjects(this.obstacles);
 			// And disable that direction if we do
 			
 			if (collisions.length > 0){
+
+				/*if(i == 1){
+					for(var j = 0 ; j < collisions.length ; j++){
+						console.log('distance from right ' + j + " " + collisions[j].distance);
+					}
+					
+				}else if( i == 3){
+					console.log('distance from left ' + collisions[0].distance);
+				}else if( i == 0){
+					console.log('distance from front ' + collisions[0].distance);
+				}*/
 				
 				if(collisions[0].distance <= distance){
-					self.controls.reverseMove1 ( true );
+					//self.controls.reverseMove1 ( true );
 					//self.controls.reverseMove3 ( true );
 
-
-					/*if( (i == 0 && direction == 0) || (i == 0 && direction == 1) || (i == 0 && direction == 2) || (i == 0 && direction == 3)){
+					//console.log( ' colisao com indice ' + i + ' com x: ' + tempR[i].x + " z:" + tempR[i].z);
+					if( (i == 0 && direction == 0) || (i == 0 && direction == 1) || (i == 0 && direction == 2) || (i == 0 && direction == 3)){
 						self.controls.reverseMove1 ( true );
+						self.controls.reverseMove4 ( true );
+						
 					}
 
 					if( ( i == 1 && direction == 0 ) || ( i == 1 && direction == 1) || (i == 1 && direction == 2) || (i == 1 && direction == 3)){
 						self.controls.reverseMove4 ( true );
+						self.controls.reverseMove2 ( true );
 					}
 
 					if ( (i == 2 && direction == 0) || (i == 2 && direction == 1) || (i == 2 && direction == 2) || (i == 2 && direction == 3) ){
+						self.controls.reverseMove4 ( true );
 						self.controls.reverseMove2 ( true );
+
+
 					}
 
 					if( (i == 3 && direction == 0) || (i == 3 && direction == 1) || ( i == 3 && direction == 2) || (i == 3 && direction == 3) ){
 						self.controls.reverseMove3 ( true );
-					}*/
+						self.controls.reverseMove1 ( true );
+
+					}
 					/*if ( i == 0 ){
 						if(tempR[i].x >= 0)
 						{
