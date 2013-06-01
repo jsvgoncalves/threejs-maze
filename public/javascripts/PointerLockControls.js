@@ -22,6 +22,10 @@ THREE.PointerLockControls = function ( camera ) {
 	var reverse3 = false;
 	var reverse4 = false;
 	var enabled = true;
+	var freeR = false;
+	var freeL = false;
+	var freeF = false;
+	var freeB = false;
 
 	var isOnObject = false;
 	var canJump = false;
@@ -149,6 +153,22 @@ THREE.PointerLockControls = function ( camera ) {
 		enabled = boolean;
 	};
 
+	this.freeForward = function () {
+		freeF = true;
+	};
+
+	this.freeRight = function () {
+		freeR = true;
+	};
+
+	this.freeBackward = function () {
+		freeB = true;
+	};
+
+	this.freeLeft = function () {
+		freeL = true;
+	};
+
 	this.update = function ( delta ) {
 		
 		if ( scope.enabled === false ) return;
@@ -161,11 +181,11 @@ THREE.PointerLockControls = function ( camera ) {
 
 			velocity.y -= JUMPSLOWING * delta;
 
-			if ( moveForward ) velocity.z -= SPEED * delta;
-			if ( moveBackward ) velocity.z += SPEED * delta;
+			if ( moveForward && freeF ) velocity.z -= SPEED * delta;
+			if ( moveBackward && freeB ) velocity.z += SPEED * delta;
 
-			if ( moveLeft ) velocity.x -= SPEED * delta;
-			if ( moveRight ) velocity.x += SPEED * delta;
+			if ( moveLeft && freeL) velocity.x -= SPEED * delta;
+			if ( moveRight && freeR) velocity.x += SPEED * delta;
 
 
 			//if ( reverse1 && moveForward ) velocity.z += 2 *SPEED * delta;
@@ -186,16 +206,22 @@ THREE.PointerLockControls = function ( camera ) {
 			//if ( ( reverse3 && moveLeft ) || ( reverse4 && moveRight ) ) velocity.x = 0;
 
 			if( reverse1 || reverse2 || reverse3 || reverse4 ){
-				if ( moveForward ) velocity.z = 0;
-				if ( moveBackward ) velocity.z = 0;
-				if ( moveLeft ) velocity.x = 0;
-				if ( moveRight ) velocity.x = 0;
+				/*if ( moveForward && !freeB && !freeF ) velocity.z = 0;
+				if ( moveBackward && !freeF && !freeB )  velocity.z = 0;
+				if ( moveLeft && !freeR  && freeL ) velocity.x = 0;
+				if ( moveRight && !freeL && freeR ) velocity.x = 0;*/
+
+				if ( ( reverse1 && !freeB ) || ( reverse3 && !freeF ) ) velocity.z = 0;
+				if ( ( reverse2 && !freeL ) || ( reverse4 && !freeR ) ) velocity.x = 0;
 			}
 			reverse1 = false;
 			reverse2 = false;
 			reverse3 = false;
 			reverse4 = false;
-
+			freeR = false;
+			freeF = false;
+			freeL = false;
+			freeB = false;
 			
 
 			yawObject.translateX( velocity.x );

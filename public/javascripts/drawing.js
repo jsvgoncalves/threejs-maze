@@ -96,6 +96,34 @@ function drawPlayer(player) {
 }
 
 
+function drawSphere() {
+	// set up the sphere vars
+	var radius = 1,
+	    segments = 16,
+	    rings = 16;
+	var sphereMaterial =
+	  new THREE.MeshLambertMaterial(
+	    {
+	      color: 0xFFE500
+	    });
+
+
+	// create a new mesh with
+	// sphere geometry - we will cover
+	// the sphereMaterial next!
+	var sphere = new THREE.Mesh(
+
+	  new THREE.SphereGeometry(
+	    radius,
+	    segments,
+	    rings),
+
+	  sphereMaterial);
+
+	return sphere;
+}
+
+
 function buildAxes( length ) {
 	var axes = new THREE.Object3D();
 

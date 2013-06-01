@@ -139,7 +139,7 @@ var MazeGL = {
 		// A camera
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
-		this.camera = new t.PerspectiveCamera(75, this.width/this.height, 1, 1000);
+		this.camera = new t.PerspectiveCamera(75, this.width/this.height, 0.001, 1000);
 		// And a renderer
 
 		this.renderer = new t.WebGLRenderer();
@@ -347,7 +347,13 @@ var MazeGL = {
 				} else if( maze[j][i] == 3) {
 					buh += '3'
 					// Saida
-					pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
+					pos = {x: i * dim.x + 5, y: 1, z: j * dim.z + 5};
+
+					var sphere = drawSphere();
+
+					sphere.position = pos;
+
+					self.map.add(sphere);
 					// self.map.add(drawExit(pos));
 					// pos = {x: i * dim.x, y: dim.y/2, z: j * dim.z};
 					// cube = myCube(dim, pos, 'wall-1.jpg');
@@ -367,9 +373,21 @@ var MazeGL = {
 			// Get the obstacles array from our world
 
 		////////////// implementação das 4 direcçoes tendo em conta a direcçao do jogador . 
+
+
+		//var cref = jQuery.extend(true, {}, self.controls);
+
+		//var cref = clone(self.controls);
+
+		//cref.update( Date.now() - self.time );
+
+
+
+
+
 		var vector = new THREE.Vector3( 0, 0, -1 );	
 
-
+		//vector = vector.applyEuler( cref.getObject().rotation, cref.getObject().eulerOrder );
 		vector = vector.applyEuler( self.controls.getObject().rotation, self.controls.getObject().eulerOrder );  // aplica transformação da camara no vector , assim obtemos o vector para onde a camara está apontando. 
 		//vector = Quaternion.Euler(self.controls.getObject().rotation.x, -45,self.controls.getObject().rotation.z ) * vector;
 		//vector.x = - vector.x;
@@ -423,6 +441,7 @@ var MazeGL = {
 		for (i = 0; i < tempR.length; i += 1) {  // this.rays
 			// We reset the raycaster to this direction
 			this.caster.set(this.controls.getObject().position, tempR[i]); // this.rays[i]
+			//this.caster.set(cref.getObject().position, tempR[i]); // this.rays[i]
 			// Test if we intersect with any obstacle mesh
 			collisions = this.caster.intersectObjects(this.obstacles);
 			// And disable that direction if we do
@@ -447,25 +466,28 @@ var MazeGL = {
 					//console.log( ' colisao com indice ' + i + ' com x: ' + tempR[i].x + " z:" + tempR[i].z);
 					if( (i == 0 && direction == 0) || (i == 0 && direction == 1) || (i == 0 && direction == 2) || (i == 0 && direction == 3)){
 						self.controls.reverseMove1 ( true );
-						self.controls.reverseMove4 ( true );
+						//self.controls.reverseMove4 ( true );
 						
 					}
 
 					if( ( i == 1 && direction == 0 ) || ( i == 1 && direction == 1) || (i == 1 && direction == 2) || (i == 1 && direction == 3)){
-						self.controls.reverseMove4 ( true );
+						//self.controls.reverseMove4 ( true );
 						self.controls.reverseMove2 ( true );
 					}
 
 					if ( (i == 2 && direction == 0) || (i == 2 && direction == 1) || (i == 2 && direction == 2) || (i == 2 && direction == 3) ){
-						self.controls.reverseMove4 ( true );
-						self.controls.reverseMove2 ( true );
+						//self.controls.reverseMove4 ( true );
+						//self.controls.reverseMove2 ( true );
+						self.controls.reverseMove3 ( true );
+
 
 
 					}
 
 					if( (i == 3 && direction == 0) || (i == 3 && direction == 1) || ( i == 3 && direction == 2) || (i == 3 && direction == 3) ){
-						self.controls.reverseMove3 ( true );
-						self.controls.reverseMove1 ( true );
+						//self.controls.reverseMove3 ( true );
+						//self.controls.reverseMove1 ( true );
+						self.controls.reverseMove4 ( true );
 
 					}
 					/*if ( i == 0 ){
@@ -525,6 +547,16 @@ var MazeGL = {
 					}*/
 
 					
+				}else{
+					if( i == 0){
+						self.controls.freeForward();
+					}else if( i == 1){
+						self.controls.freeLeft();
+					}else if(i == 2){
+						self.controls.freeBackward();
+					}else{
+						self.controls.freeRight();
+					}
 				}
 			} 
 				// console.log('COLIDIU com distancia ' + collisions[0].distance);
@@ -794,6 +826,38 @@ var MazeGL = {
        		
 		}
 	}
+}
+
+function clone(obj) {
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    // Handle Date
+    if (obj instanceof Date) {
+        var copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        var copy = [];
+        for (var i = 0, len = obj.length; i < len; i++) {
+            copy[i] = clone(obj[i]);
+        }
+        return copy;
+    }
+
+    // Handle Object
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
 }
 
 MazeGL.prepare();
