@@ -87,10 +87,10 @@ function drawCeiling () {
 	return mesh;
 }
 
-function drawPlayers(player) {
+function drawPlayer(player) {
 	console.log('drawPlayers')
 	console.log(player)
-	dim = {x: 5, y: 5, z: 5}, pos = {x: player.coord[0], y: player.coord[1], z: player.coord[2]};
+	dim = {x: 5, y: 5, z: 5}, pos = {x: - player.coord[0] * 10.0, y: player.coord[1] + 10.0 , z: - player.coord[2] * 10.0};
 	var cube = myCube(dim, pos, 'buh.jpg');
 	return cube;
 }

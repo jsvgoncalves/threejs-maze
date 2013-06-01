@@ -7,29 +7,100 @@ function updateStatus (players) {
 	Players.update(players.players);
 }
 
+/**
+Players and stuff
+****************/
+
 var Players = {
+
+	players : new Array(),
+	cubes : new Array(),
 	init: function (config) {
 
 	},
 
 	update: function (players) {
-		this.players = players
-		MazeGL.addPlayers();
+		this.clean(players);
+		//this.players = players
+		//MazeGL.addPlayers();
+	},
+
+	clean : function(players) {
+
+		var clean1 = 0,
+			self = MazeGL;
+
+		//clean removed players
+		for( var i = 0 ; i < this.players.length ; i++){
+			clean1 = 0;
+			for( var j = 0 ; j < players.length ; j++){
+				if(this.players[i].name == players[j].name){
+					this.players[i].status = players[j].status;
+					this.players[i].win = players[j].win;
+					console.log ( 'win: ' + players[j].win);
+					if(players[j].win == 1){
+						console.log(' JOGADOR ' + players[j].name + ' ACABOU DE GANHAR YEY !');
+						self.controls.statusControls( false );
+					}
+					clean1 = 1;
+					break;
+				}
+			}
+
+			//remove player i
+			if(clean1 == 0){
+				MazeGL.removePlayer(this.cubes[i]);
+				this.cubes.splice(i,1);
+				this.players.splice(i,1);
+				i--;
+			}
+		}
+
+		//add news players
+		for( var i = 0 ; i < players.length ; i++){
+			clean1 = 0;
+			for( var j = 0 ; j < this.players.length ; j++){
+				if(players[i].name == this.players[j].name){
+					clean1 = 1;
+					break;
+				}
+			}
+
+			// add player 
+			if ( clean1 == 0){
+				var cube = drawPlayer(players[i]);
+				this.cubes.push( cube );
+				if( get_player_name() != players[i].name){
+					MazeGL.addPlayer(this.cubes[this.cubes.length-1]);
+				}
+				this.players.push(players[i]);
+			}
+
+		}
 	},
 
 	updatePlayer: function (name, coordsx, coordsy, coordsz, status) {
 		for (var i = this.players.length - 1; i >= 0; i--) {
 			if(this.players[i].name == name) {
-				console.log(this.players[i]);
-				console.log(this.players[i].name);
+				//console.log(this.players[i]);
+				//console.log(this.players[i].name);
 				this.players[i].coord[0] = coordsx;
 				this.players[i].coord[1] = coordsy;
 				this.players[i].coord[2] = coordsz;
+				if(name != get_player_name()){
+					this.cubes[i].position.x = - 10.0 * coordsx;
+					this.cubes[i].position.y = 10.0 + coordsy;
+					this.cubes[i].position.z = - 10.0 * coordsz;
+					console.log('actualizou posiçao ' + this.players[i].name);
+				}
 			}
-		};
+		}
 
-		MazeGL.addPlayers();
+		//MazeGL.addPlayers();
 	}
+
+
+
 }
 
 function parseMaze (map) {
@@ -120,8 +191,13 @@ var MazeGL = {
 		}else{
 			this.oldMaze = this.config.maze;
 			this.config = config;
-			this.parseMaze()
+			this.parseMaze();
+
 		}
+
+		this.controls.statusControls( true );
+
+		
 		
 
 	},
@@ -160,7 +236,7 @@ var MazeGL = {
 		} 
 	},
 
-	addPlayers: function () {
+	/*addPlayers: function () {
 		var self = MazeGL
 		var players = Players.players;
 
@@ -171,6 +247,20 @@ var MazeGL = {
 			self.scene.add(tmp);
 		};
 		console.log('}');
+	},*/
+
+
+	addPlayer : function (player) {
+		var self = MazeGL;
+
+		self.scene.add(player);
+
+	},
+
+	removePlayer : function (player) {
+		var self = MazeGL;
+
+		self.scene.remove(player);
 	},
 
 	addObjects : function () {
@@ -627,8 +717,10 @@ var MazeGL = {
 		self.objects.cube2.rotation.x += 0.01
 		self.objects.cube3.rotation.z -= 0.01
 
-
+		// update controls 
 		self.controls.update( Date.now() - self.time)
+
+		
 
 		// Set the scoreboard.
 		var players = Players.players,
@@ -650,16 +742,15 @@ var MazeGL = {
 		self.playerElement.innerHTML = playerHTML;
 
 		// If the position is changed, then update to the server
-		if( x != self.lastPos.x ||
-			y != self.lastPos.y ||
-			z != self.lastPos.z) {
-			sendPosition(
-				((x)/10.0),
-				((y)/10.0),
-				((z)/10.0));
-				self.lastPos.x = x
-				self.lastPos.y = y
-				self.lastPos.z = z
+		if( x != self.lastPos.x || y != self.lastPos.y || z != self.lastPos.z ) {
+			
+			Players.updatePlayer(get_player_name(), ((x)/10.0), ((y)/10.0), ((z)/10.0), 1);
+
+			sendPosition( ((x)/10.0), ((y)/10.0), ((z)/10.0) );
+
+			self.lastPos.x = x
+			self.lastPos.y = y
+			self.lastPos.z = z
 		}
 
 		// Only render if game has started

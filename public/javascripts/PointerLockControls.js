@@ -21,6 +21,7 @@ THREE.PointerLockControls = function ( camera ) {
 	var reverse2 = false;
 	var reverse3 = false;
 	var reverse4 = false;
+	var enabled = true;
 
 	var isOnObject = false;
 	var canJump = false;
@@ -144,74 +145,79 @@ THREE.PointerLockControls = function ( camera ) {
 		reverse4 = boolean;
 	};
 
+	this.statusControls = function ( boolean ) {
+		enabled = boolean;
+	};
+
 	this.update = function ( delta ) {
 		
 		if ( scope.enabled === false ) return;
 
-		delta *= 0.1;
+		if( enabled ){
+			delta *= 0.1;
 
-		velocity.x += ( - velocity.x ) * SLOWING * delta;
-		velocity.z += ( - velocity.z ) * SLOWING * delta;
+			velocity.x += ( - velocity.x ) * SLOWING * delta;
+			velocity.z += ( - velocity.z ) *  SLOWING * delta;
 
-		velocity.y -= JUMPSLOWING * delta;
+			velocity.y -= JUMPSLOWING * delta;
 
-		if ( moveForward ) velocity.z -= SPEED * delta;
-		if ( moveBackward ) velocity.z += SPEED * delta;
+			if ( moveForward ) velocity.z -= SPEED * delta;
+			if ( moveBackward ) velocity.z += SPEED * delta;
 
-		if ( moveLeft ) velocity.x -= SPEED * delta;
-		if ( moveRight ) velocity.x += SPEED * delta;
+			if ( moveLeft ) velocity.x -= SPEED * delta;
+			if ( moveRight ) velocity.x += SPEED * delta;
 
 
-		//if ( reverse1 && moveForward ) velocity.z += 2 *SPEED * delta;
-		//if ( reverse2 && moveBackward ) velocity.z -= 2 *SPEED * delta;
-		//if ( reverse3 && moveLeft ) velocity.x += 2 * SPEED * delta;
-		//if ( reverse4 && moveRight ) velocity.x -= 2 * SPEED * delta;
+			//if ( reverse1 && moveForward ) velocity.z += 2 *SPEED * delta;
+			//if ( reverse2 && moveBackward ) velocity.z -= 2 *SPEED * delta;
+			//if ( reverse3 && moveLeft ) velocity.x += 2 * SPEED * delta;
+			//if ( reverse4 && moveRight ) velocity.x -= 2 * SPEED * delta;
 
-		
-
-		if ( isOnObject === true ) {
-
-			velocity.y = Math.max( 0, velocity.y );
 			
+
+			if ( isOnObject === true ) {
+
+				velocity.y = Math.max( 0, velocity.y );
+				
+				
+			}
+
+			//if ( ( reverse1 && moveForward ) || ( reverse2 && moveBackward) ) velocity.z = 0;
+			//if ( ( reverse3 && moveLeft ) || ( reverse4 && moveRight ) ) velocity.x = 0;
+
+			if( reverse1 || reverse2 || reverse3 || reverse4 ){
+				if ( moveForward ) velocity.z = 0;
+				if ( moveBackward ) velocity.z = 0;
+				if ( moveLeft ) velocity.x = 0;
+				if ( moveRight ) velocity.x = 0;
+			}
+			reverse1 = false;
+			reverse2 = false;
+			reverse3 = false;
+			reverse4 = false;
+
 			
+
+			yawObject.translateX( velocity.x );
+			yawObject.translateY( velocity.y ); 
+			yawObject.translateZ( velocity.z );
+
+			if ( yawObject.position.y < 10 ) {
+
+				velocity.y = 0;
+				yawObject.position.y = 10;
+
+				canJump = true;
+
+			} 
+
+			if ( yawObject.position.y > JUMPMAX ) {
+				
+				velocity.y = 0;
+				yawObject.position.y = JUMPMAX;
+
+			} 
 		}
-
-		//if ( ( reverse1 && moveForward ) || ( reverse2 && moveBackward) ) velocity.z = 0;
-		//if ( ( reverse3 && moveLeft ) || ( reverse4 && moveRight ) ) velocity.x = 0;
-
-		if( reverse1 || reverse2 || reverse3 || reverse4 ){
-			if ( moveForward ) velocity.z = 0;
-			if ( moveBackward ) velocity.z = 0;
-			if ( moveLeft ) velocity.x = 0;
-			if ( moveRight ) velocity.x = 0;
-		}
-		reverse1 = false;
-		reverse2 = false;
-		reverse3 = false;
-		reverse4 = false;
-
-		
-
-		yawObject.translateX( velocity.x );
-		yawObject.translateY( velocity.y ); 
-		yawObject.translateZ( velocity.z );
-
-		if ( yawObject.position.y < 10 ) {
-
-			velocity.y = 0;
-			yawObject.position.y = 10;
-
-			canJump = true;
-
-		} 
-
-		if ( yawObject.position.y > JUMPMAX ) {
-			
-			velocity.y = 0;
-			yawObject.position.y = JUMPMAX;
-
-		} 
-
 
 	};
 

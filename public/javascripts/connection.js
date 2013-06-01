@@ -189,7 +189,7 @@ function start_game_connection(port) {
 				aqui fazes alocaçao da informação recebida como determinar se o jogo acabou ou se um existe jogadores novos, etc etc 
 				**/
 				console.log('updated players');
-				console.log(info_players);
+				//console.log(info_players);
 				updateStatus(info_players);
 
 			break;
@@ -266,6 +266,11 @@ function disconnect(){
 		game_socket.close();
 		reset();
 	}
+}
+
+
+function get_player_name(){
+	return player_name;
 }
 
 function sendPosition(x, y, z) {
