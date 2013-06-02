@@ -9,13 +9,15 @@ function myCube(dim, pos, color) {
 	var cube_material = new t.MeshLambertMaterial({map: t.ImageUtils.loadTexture('images/' + color)});
 	var cube = new t.Mesh(cube_geometry, cube_material);
 	cube.position = {x: pos.x + dim.x / 2, y: pos.y, z: pos.z + dim.z / 2};
+	cube.castShadow = true;
+	cube.receiveShadow = true;
 	return cube;
 }
 
 function myFloor (argument) {
 	//PlaneGeometry( width, height, widthSegments, heightSegments )
 	//var floor_geometry = new t.CubeGeometry(30, 1, 30);
-	var floor_geometry = new t.PlaneGeometry(35, 35, 64, 64);
+	var floor_geometry = new t.PlaneGeometry(500, 500, 254, 254);
 	floor_geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 	//var floor_geometry = new t.CubeGeometry(30, 1, 30);
 	//.MeshLambertMaterial({color: 0xEDCBA0})
@@ -24,6 +26,8 @@ function myFloor (argument) {
 	var floor_material = new t.MeshBasicMaterial({map: t.ImageUtils.loadTexture('images/gravel.jpg')});
 	var floor = new t.Mesh(floor_geometry, floor_material);
 	floor.position.y = 0;
+	floor.castShadow = true;
+	floor.receiveShadow = true;
 	// floor.rotation.x -= 90 * Math.PI / 180;
 	return floor;
 }
@@ -88,10 +92,12 @@ function drawCeiling () {
 }
 
 function drawPlayer(player) {
-	console.log('drawPlayers')
-	console.log(player)
+	// console.log('drawPlayers')
+	// console.log(player)
 	dim = {x: 5, y: 5, z: 5}, pos = {x: - player.coord[0] * 10.0, y: player.coord[1] + 10.0 , z: - player.coord[2] * 10.0};
 	var cube = myCube(dim, pos, 'buh.jpg');
+	cube.castShadow = true;
+	cube.receiveShadow = true;
 	return cube;
 }
 

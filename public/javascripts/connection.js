@@ -188,7 +188,7 @@ function start_game_connection(port) {
 				/**----------------------------------------------------------------------------------------------------------------
 				aqui fazes alocaçao da informação recebida como determinar se o jogo acabou ou se um existe jogadores novos, etc etc 
 				**/
-				console.log('updated players');
+				// console.log('updated players');
 				//console.log(info_players);
 				updateStatus(info_players);
 

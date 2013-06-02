@@ -27,8 +27,7 @@ var Players = {
 
 	clean : function(players) {
 
-		var clean1 = 0,
-			self = MazeGL;
+		var clean1 = 0;
 
 		//clean removed players
 		for( var i = 0 ; i < this.players.length ; i++){
@@ -39,8 +38,9 @@ var Players = {
 					this.players[i].win = players[j].win;
 					console.log ( 'win: ' + players[j].win);
 					if(players[j].win == 1){
-						console.log(' JOGADOR ' + players[j].name + ' ACABOU DE GANHAR YEY !');
-						self.controls.statusControls( false );
+						MazeGL.notifyMessage.innerHTML = players[j].name + ' won!';
+						MazeGL.notifyElement.style.display = 'inline';
+						MazeGL.controls.statusControls( false );
 					}
 					clean1 = 1;
 					break;
@@ -105,7 +105,7 @@ var Players = {
 
 function parseMaze (map) {
 	// body...
-	console.log('I got the map' + JSON.stringify(map));
+	// console.log('I got the map' + JSON.stringify(map));
 	// var maze = new MazeGL();
 	MazeGL.init({maze: map})
 }
@@ -134,6 +134,7 @@ var MazeGL = {
 
 		// We need a scene
 		this.scene = new t.Scene();
+		this.scene.fog = new t.FogExp2(0x000000, 0.05);
 		// this.scene.fog = new t.FogExp2(0xFFFFFF, 0.005);
 
 		// A camera
@@ -143,9 +144,21 @@ var MazeGL = {
 		// And a renderer
 
 		this.renderer = new t.WebGLRenderer();
-		this.renderer.setClearColor(new t.Color(0x123466));
+		this.renderer.setClearColor(new t.Color(0x000000));
+		// this.renderer.setClearColor(new t.Color(0x123466));
 		this.renderer.setSize(this.width, this.height);
 		// this.renderer.setSize(window.innerWidth, window.innerHeight);
+		// this.renderer.shadowMapEnabled = true;
+		// this.renderer.shadowMapSoft = true;
+
+		// this.renderer.shadowCameraNear = 3;
+		// this.renderer.shadowCameraFar = this.camera.far;
+		// this.renderer.shadowCameraFov = 50;
+
+		// this.renderer.shadowMapBias = 0.0039;
+		// this.renderer.shadowMapDarkness = 0.5;
+		// this.renderer.shadowMapWidth = 1024;
+		// this.renderer.shadowMapHeight = 1024;
 		document.body.appendChild(this.renderer.domElement);
 	},
 
@@ -162,8 +175,8 @@ var MazeGL = {
 			// HTML elements to display information
 			this.infoElement = document.getElementById( 'info-tab' )
 			this.playerElement = document.getElementById( 'info-player' )
-			
-			
+			this.notifyElement = document.getElementById( 'notification' )
+			this.notifyMessage = document.getElementById( 'notification-message' )
 			// COLISOES
 
 			this.rays = [
@@ -186,15 +199,16 @@ var MazeGL = {
 			this.parseMaze()
 			this.hideHTML()
 			//this.render();
+
 			this.start()
 
-		}else{
+		} else {
 			this.oldMaze = this.config.maze;
 			this.config = config;
 			this.parseMaze();
 
 		}
-
+		this.notifyElement.style.display = 'none';
 		this.controls.statusControls( true );
 
 		
@@ -266,26 +280,26 @@ var MazeGL = {
 	addObjects : function () {
 		var self = MazeGL
 
-		self.objects.floor = drawFloor()
+		self.objects.floor = myFloor()
 		
 		self.scene.add(self.objects.floor);
 		// self.objects.ceiling = drawCeiling()
 		// self.scene.add(self.objects.ceiling);
 		// Now let's add a cube.
-		dim = {x: 30, y: 30, z: 30}, pos = {x: 70, y: 130, z: 0}
-		self.objects.cube1 = myCube(dim, pos, 'meme.jpg')
-		self.scene.add(self.objects.cube1)
-		// And another cube.
-		dim = {x: 30, y: 30, z: 30}, pos = {x: -50, y: 130, z: 10}
-		self.objects.cube2 = myCube(dim, pos, 'trololo.jpg')
-		self.scene.add(self.objects.cube2)
-		// And another cube.
-		dim = {x: 30, y: 30, z: 30}, pos = {x: 10, y: 100, z: -13}
-		self.objects.cube3 = myCube(dim, pos, 'wall-1.jpg')
-		self.scene.add(self.objects.cube3);
+		// dim = {x: 30, y: 30, z: 30}, pos = {x: 70, y: 130, z: 0}
+		// self.objects.cube1 = myCube(dim, pos, 'meme.jpg')
+		// self.scene.add(self.objects.cube1)
+		// // And another cube.
+		// dim = {x: 30, y: 30, z: 30}, pos = {x: -50, y: 130, z: 10}
+		// self.objects.cube2 = myCube(dim, pos, 'trololo.jpg')
+		// self.scene.add(self.objects.cube2)
+		// // And another cube.
+		// dim = {x: 30, y: 30, z: 30}, pos = {x: 10, y: 100, z: -13}
+		// self.objects.cube3 = myCube(dim, pos, 'wall-1.jpg')
+		// self.scene.add(self.objects.cube3);
 		
-		axes = buildAxes( 1000 );
-		self.scene.add( axes );
+		// axes = buildAxes( 1000 );
+		// self.scene.add( axes );
 	},
 
 	setLights : function () {
@@ -293,6 +307,19 @@ var MazeGL = {
 		this.directionalLight1.position.set( 0.5, 0.5, 0.5 )
 		this.scene.add( this.directionalLight1 )
 
+		// this.spotLight = new THREE.SpotLight( 0xffffff );
+		// this.spotLight.position.set( 100, 1000, 100 );
+
+		// // this.spotLight.castShadow = true;
+
+		// // this.spotLight.shadowMapWidth = 1024;
+		// // this.spotLight.shadowMapHeight = 1024;
+
+		// // this.spotLight.shadowCameraNear = 500;
+		// // this.spotLight.shadowCameraFar = 4000;
+		// // this.spotLight.shadowCameraFov = 30;
+
+		// this.scene.add( this.spotLight );
 		this.directionalLight2 = new t.DirectionalLight( 0xF7EFBE, 0.8 )
 		this.directionalLight2.position.set( -0.5, -1, -0.5 )
 		this.scene.add( this.directionalLight2 );
@@ -316,7 +343,7 @@ var MazeGL = {
 			this.obstacles.length = 0;	
 			self.map = new t.Object3D();
 
-		}else{
+		} else {
 			self.map_loaded = true;
 		}
 		/////////////////////////////////////////////////////////
@@ -324,11 +351,9 @@ var MazeGL = {
 
 		dim = {x: 10, y: 20, z: 10};
 		for (var j = 0; j < cols; j++) {
-			buh = ''
 			for (var i = 0; i < rows; i++) {
 				// console.log(i + ' ' + j + 'ble -> ' + maze[i][j]);
 				if(maze[j][i] == 0) {
-					buh += '0'
 					// console.log('nothing here')
 				} else if(maze[j][i] == 1) {
 					// pos = {x: i * dim.x - half_x * dim.x, y: dim.y/2, z: j * dim.z - half_z * dim.z};
@@ -336,31 +361,27 @@ var MazeGL = {
 					cube = myCube(dim, pos, 'wall-1.jpg');
 					self.map.add(cube);
 					this.obstacles.push(cube);
-					buh += '1'
 				}else if( maze[j][i] == 2){
 					//this.controls.getObject().position.set( -(j * dim.x + dim.x / 2), dim.y/2, -(i * dim.z + dim.z / 2)); ao contario 
 					this.controls.getObject().position.set( -(i * dim.z + dim.z / 2), dim.y/2,  -(j * dim.x + dim.x / 2));
 					//self.camera.position.x = i * dim.x - half_x * dim.x;
 					//self.camera.position.y = dim.y/2 ;
-					buh += '2'
 					//self.camera.position.z = j * dim.z - half_z * dim.z; 
 				} else if( maze[j][i] == 3) {
-					buh += '3'
 					// Saida
-					pos = {x: i * dim.x + 5, y: 1, z: j * dim.z + 5};
+					pos = {x: i * dim.x + 5, y: 10, z: j * dim.z + 5};
 
-					var sphere = drawSphere();
+					self.objects.sphere = drawSphere();
 
-					sphere.position = pos;
+					self.objects.sphere.position = pos;
 
-					self.map.add(sphere);
+					self.map.add(self.objects.sphere);
 					// self.map.add(drawExit(pos));
 					// pos = {x: i * dim.x, y: dim.y/2, z: j * dim.z};
 					// cube = myCube(dim, pos, 'wall-1.jpg');
 					// self.map.add(cube);
 				}
 			}
-				console.log(buh);
 		}
 		self.map.applyMatrix( new THREE.Matrix4().makeRotationY( - Math.PI ) );
 		self.scene.add(self.map)
@@ -738,6 +759,9 @@ var MazeGL = {
 			x = Math.abs(pos.x);
 			y = Math.abs(pos.y);
 			z = Math.abs(pos.z);
+
+		// self.spotLight.position.set( pos.x + 2, pos.y, pos.z );
+
 		//console.log("processando");
 		this.exec_id = window.requestAnimationFrame(self.render); 
 		self.controls.isOnObject( false );
@@ -745,9 +769,10 @@ var MazeGL = {
 		self.detectIntersection(self)
 
 		// Animations
-		self.objects.cube1.rotation.y += 0.01
-		self.objects.cube2.rotation.x += 0.01
-		self.objects.cube3.rotation.z -= 0.01
+		// self.objects.cube1.rotation.y += 0.01
+		// self.objects.cube2.rotation.x += 0.01
+		// self.objects.cube3.rotation.z -= 0.01
+		self.objects.sphere.rotation.y += 0.5;
 
 		// update controls 
 		self.controls.update( Date.now() - self.time)
@@ -760,13 +785,16 @@ var MazeGL = {
 
 		for (var i = players.length - 1; i >= 0; i--) {
 			// console.log(players[i].name)
-			infoHTML += players[i].name + ' <' + players[i].coord + '><br>';
+			infoHTML += players[i].name +
+				' <' + parseInt(players[i].coord[0]) + ',' + parseInt(players[i].coord[2]) + '><br>';
+			// console.log(players[i]);
 		};
 		self.infoElement.innerHTML =  infoHTML
 	
 
 		// Add player HUD
 		playerHTML = 
+			get_player_name() + '<br>' +
 			'x: ' + parseInt((x)/10.0) + '<br>' +
 			'z: ' + parseInt((z)/10.0) + '<br>' +
 			'y: ' + parseInt(y);
