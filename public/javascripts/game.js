@@ -82,7 +82,7 @@ var Players = {
 					MazeGL.addPlayer(this.cubes[this.cubes.length-1]);
 				}
 				this.players.push(players[i]);
-				this.sounds.push (new Sound([],50,0.8,2));
+				this.sounds.push (new Sound([],100,0.8,2));
 				var temp1 = new Array();
 				temp1.push(players[i].coord[0]);
 				temp1.push(players[i].coord[1]);
@@ -393,7 +393,7 @@ var MazeGL = {
 		this.backgroundSound = new Sound( [ '../sounds/background.ogg'], 0, 0.4 , 0 );
 		this.backgroundSound.play();
 		this.endSound = new Sound( [ '../sounds/end.ogg'],50 , 1 , 1 );
-		this.stepSound = new Sound( [],50,0.8,2);
+		this.stepSound = new Sound( [],100,0.8,2);
 		//this.rstepSound = new Sound( [ '../sounds/rightstep.ogg'], 50, 1,2);
 		console.log('som carregado');
 
