@@ -15,6 +15,9 @@ var Players = {
 
 	players : new Array(),
 	cubes : new Array(),
+	sounds : new Array(),
+	oldPos : new Array(),
+
 	init: function (config) {
 
 	},
@@ -38,6 +41,8 @@ var Players = {
 					this.players[i].win = players[j].win;
 					console.log ( 'win: ' + players[j].win);
 					if(players[j].win == 1){
+
+						MazeGL.backgroundSound.stop();
 						MazeGL.notifyMessage.innerHTML = players[j].name + ' won!';
 						MazeGL.notifyElement.style.display = 'inline';
 						MazeGL.controls.statusControls( false );
@@ -52,6 +57,9 @@ var Players = {
 				MazeGL.removePlayer(this.cubes[i]);
 				this.cubes.splice(i,1);
 				this.players.splice(i,1);
+				this.sounds[i].stop();
+				this.sounds.splice(i,1);
+				this.oldPos.splice(i,1);
 				i--;
 			}
 		}
@@ -74,9 +82,26 @@ var Players = {
 					MazeGL.addPlayer(this.cubes[this.cubes.length-1]);
 				}
 				this.players.push(players[i]);
+				this.sounds.push (new Sound([],50,0.8,2));
+				var temp1 = new Array();
+				temp1.push(players[i].coord[0]);
+				temp1.push(players[i].coord[1]);
+				temp1.push(players[i].coord[2]);
+				this.oldPos.push (temp1);
 			}
 
 		}
+	},
+
+	comparePosPlayer : function (index) {
+		if (( this.oldPos[index][0] != this.players[index].coord[0] ) || ( this.oldPos[index][1] != this.players[index].coord[1] ) || ( this.oldPos[index][2] != this.players[index].coord[2] )){
+			this.oldPos[index][0] = this.players[index].coord[0];
+			this.oldPos[index][1] = this.players[index].coord[1];
+			this.oldPos[index][2] = this.players[index].coord[2];
+			return true;
+		}
+
+		return false;
 	},
 
 	updatePlayer: function (name, coordsx, coordsy, coordsz, status) {
@@ -84,13 +109,21 @@ var Players = {
 			if(this.players[i].name == name) {
 				//console.log(this.players[i]);
 				//console.log(this.players[i].name);
+				
+				/*this.oldPos[i][0] = this.players[i].coord[0];
+				this.oldPos[i][1] = this.players[i].coord[1];
+				this.oldPos[i][2] = this.players[i].coord[2];*/
 				this.players[i].coord[0] = coordsx;
 				this.players[i].coord[1] = coordsy;
 				this.players[i].coord[2] = coordsz;
+
+				
 				if(name != get_player_name()){
+
 					this.cubes[i].position.x = - 10.0 * coordsx;
 					this.cubes[i].position.y = 10.0 + coordsy;
 					this.cubes[i].position.z = - 10.0 * coordsz;
+					this.sounds[i].setPosition(this.cubes[i].position);
 					console.log('actualizou posiçao ' + this.players[i].name);
 				}
 			}
@@ -101,6 +134,141 @@ var Players = {
 
 
 
+}
+
+/**
+*types options:
+*0 -> plays sounds loop forever
+*1 -> plays sounds loop forever + distance to camera effect
+*2 -> plays sounds when action trigger 
+**/
+
+var Sound = function ( sources, radius, volume, type ) {
+
+	var type = type;
+	var audio = document.createElement( 'audio' );
+	var position = new THREE.Vector3();
+	var radius = radius;
+	var volume = volume;
+	var audio1 = undefined;
+	var step = 0;
+	var playing = false;
+
+	if( type == 2){
+		audio1 = document.createElement( 'audio' );
+
+		var source = document.createElement( 'source' );
+		source.src = '../sounds/leftstep.ogg';
+
+		audio.appendChild( source );
+
+		source = document.createElement( 'source' );
+		source.src = '../sounds/rightstep.ogg';
+
+		audio1.appendChild( source );
+
+
+	}else{
+		for ( var i = 0; i < sources.length; i ++ ) {
+
+		var source = document.createElement( 'source' );
+		source.src = sources[ i ];
+
+		audio.appendChild( source );
+
+		}
+	}
+		
+
+	
+
+	if( type == 0){
+		audio.volume = volume;
+	}else{
+		audio.volume = 0;
+	}
+	
+
+	this.setPosition = function ( pos ) {
+		position.copy ( pos );
+	}
+	
+
+	this.play = function () {
+
+		if(type == 0 || type == 1){
+			audio.loop = true;
+			audio.play();
+		}else{
+			if(!playing){
+				playing = true;
+				audio.play();
+			}
+		}
+		
+
+
+	}
+
+	this.isPlaying = function () {
+		return !audio.paused;
+	}
+
+	this.stop = function () {
+		if(type == 2){
+			playing = false;
+		}else{
+			audio.pause();
+		}
+	}
+	
+
+	this.update = function ( camera ) {
+
+		var distance = position.distanceTo( camera.position );
+
+		if ( distance <= radius ) {
+			
+			
+			if( type == 2){
+				
+				if(step == 0){
+					// nao está implementado 
+					if(!audio.paused){
+						audio.volume = volume * ( 1 - distance / radius );
+					}else{
+						step = 1;
+						audio1.volume = volume * ( 1 - distance / radius );
+						if( playing ){
+							audio1.play();
+						}
+						
+					}
+					
+				}else{
+					if(!audio1.paused){
+						audio1.volume = volume * ( 1 - distance / radius );
+					}else{
+						step = 0;
+						audio.volume = volume * ( 1 - distance / radius );
+						if(playing){
+							audio.play();
+						}
+						
+					}
+				}
+				
+				
+			}else{
+				audio.volume = volume * ( 1 - distance / radius );
+			}
+		} else {
+
+			audio.volume = 0;
+
+		}
+
+	}
 }
 
 function parseMaze (map) {
@@ -188,7 +356,7 @@ var MazeGL = {
 			this.caster = new t.Raycaster();
 
 
-
+			
 			this.attachEvents()
 			this.addObjects()
 			this.setLights()
@@ -196,6 +364,7 @@ var MazeGL = {
 			this.lockMouse()
 			
 			this.setUpControls()
+			this.initSounds()
 			this.parseMaze()
 			this.hideHTML()
 			//this.render();
@@ -203,16 +372,30 @@ var MazeGL = {
 			this.start()
 
 		} else {
+			this.endSound.stop();
+			this.backgroundSound.play();
 			this.oldMaze = this.config.maze;
 			this.config = config;
 			this.parseMaze();
+			
 
 		}
+		this.endSound.play(); 
 		this.notifyElement.style.display = 'none';
 		this.controls.statusControls( true );
 
 		
 		
+
+	},
+
+	initSounds : function () {
+		this.backgroundSound = new Sound( [ '../sounds/background.ogg'], 0, 0.4 , 0 );
+		this.backgroundSound.play();
+		this.endSound = new Sound( [ '../sounds/end.ogg'],50 , 1 , 1 );
+		this.stepSound = new Sound( [],50,0.8,2);
+		//this.rstepSound = new Sound( [ '../sounds/rightstep.ogg'], 50, 1,2);
+		console.log('som carregado');
 
 	},
 
@@ -338,6 +521,7 @@ var MazeGL = {
 		/* reset do mapa */
 		if ( self.map_loaded ) { 
 			self.scene.remove( self.map );
+			self.scene.remove( self.objects.floor );
 			this.obstacles.length = 0;	
 			self.map = new t.Object3D();
 
@@ -348,6 +532,7 @@ var MazeGL = {
 
 		self.objects.floor = myFloor(cols, rows)
 		self.scene.add(self.objects.floor);
+
 		dim = {x: 10, y: 20, z: 10};
 		for (var j = 0; j < cols; j++) {
 			for (var i = 0; i < rows; i++) {
@@ -363,12 +548,16 @@ var MazeGL = {
 				}else if( maze[j][i] == 2){
 					//this.controls.getObject().position.set( -(j * dim.x + dim.x / 2), dim.y/2, -(i * dim.z + dim.z / 2)); ao contario 
 					this.controls.getObject().position.set( -(i * dim.z + dim.z / 2), dim.y/2,  -(j * dim.x + dim.x / 2));
+
+					
 					//self.camera.position.x = i * dim.x - half_x * dim.x;
 					//self.camera.position.y = dim.y/2 ;
 					//self.camera.position.z = j * dim.z - half_z * dim.z; 
 				} else if( maze[j][i] == 3) {
 					// Saida
 					pos = {x: i * dim.x + 5, y: 10, z: j * dim.z + 5};
+
+					this.endSound.setPosition ( {x: -(i * dim.z + dim.z / 2), y: dim.y/2, z:  -(j * dim.x + dim.x / 2) });
 
 					self.objects.sphere = drawSphere();
 
@@ -776,20 +965,42 @@ var MazeGL = {
 		// update controls 
 		self.controls.update( Date.now() - self.time)
 
-		
+
+
+		// update sound
+		self.endSound.update(self.controls.getObject());
 
 		// Set the scoreboard.
 		var players = Players.players,
 			infoHTML = '';
 
+
+		var itemp = 0;
+
 		for (var i = players.length - 1; i >= 0; i--) {
 			// console.log(players[i].name)
 			infoHTML += players[i].name +
 				' <' + parseInt(players[i].coord[0]) + ',' + parseInt(players[i].coord[2]) + '><br>';
+
+			if( players[i].name == get_player_name()){
+				itemp = i;
+				self.stepSound.setPosition(self.controls.getObject().position);
+			}else {
+				if(Players.comparePosPlayer(i))
+				{
+					
+					Players.sounds[i].play();
+				}else{
+					
+					Players.sounds[i].stop();
+				}
+
+				Players.sounds[i].update(self.controls.getObject());
+			}
+			//Players.sounds[i].update(self.controls.getObject());
 			// console.log(players[i]);
 		};
 		self.infoElement.innerHTML =  infoHTML
-	
 
 		// Add player HUD
 		playerHTML = 
@@ -810,7 +1021,12 @@ var MazeGL = {
 			self.lastPos.x = x
 			self.lastPos.y = y
 			self.lastPos.z = z
+			self.stepSound.play();
+		}else{
+			self.stepSound.stop();
 		}
+
+		self.stepSound.update(self.controls.getObject());
 
 		// Only render if game has started
 		if(self.started) {
@@ -855,36 +1071,8 @@ var MazeGL = {
 	}
 }
 
-function clone(obj) {
-    // Handle the 3 simple types, and null or undefined
-    if (null == obj || "object" != typeof obj) return obj;
 
-    // Handle Date
-    if (obj instanceof Date) {
-        var copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
 
-    // Handle Array
-    if (obj instanceof Array) {
-        var copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
 
-    // Handle Object
-    if (obj instanceof Object) {
-        var copy = {};
-        for (var attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
-        }
-        return copy;
-    }
-
-    throw new Error("Unable to copy obj! Its type isn't supported.");
-}
 
 MazeGL.prepare();
