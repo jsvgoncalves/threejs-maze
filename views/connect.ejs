@@ -9,17 +9,40 @@
 		</div>
 		<div class="container">
 			<h1><%= title %></h1>
-			<p>click to connect to server</p></br>
+			<h2>Connect to a server</h2>
 			<form name="form_connect" action="javascript:start_connection();" >
-				<label>username</label>
-				<input type="text" id="name" placeholder="Username" value="Guest"></input></br>
-				<label>host</label>
-				<input type="text" id="host" placeholder="host" value="127.0.0.1"></input></br>
-				<label>port</label>
-				<input type="text" id="port" placeholder="port" value="4000"></input>
-				<button id="connect">Connect</button>
+				<ul>
+					<li>
+						<input type="text" id="name" placeholder="Username" value="Guest"></input></br>
+					</li>
+					<li>
+						<input type="text" id="host" placeholder="Host" value="<%=ip%>"></input></br>
+					</li>
+					<li>
+						<input type="text" id="port" placeholder="port" value="4000"></input>
+					</li>
+					<li>
+						<button id="connect">Connect</button>
+					</li>
+				</ul>
 				<!-- <input type="button" value="Connect" onClick="start_connection();" /> -->
 			</form>
+
+			<div class="how-to">
+				<h2>Instructions</h2>
+				<ol>
+					<li>
+						Click on the screen to start playing
+					</li>
+					<li>
+						Use WASD or arrow keys to move around and the mouse to look.						
+					</li>
+					<li>
+						Press <strong>tab</strong> to view online players.
+					</li>
+				</ol>
+
+			</div>
 		</div>
 
 		<div id="absoluteCenter"  style="display:none">

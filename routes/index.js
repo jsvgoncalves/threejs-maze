@@ -13,7 +13,13 @@ exports.index = function(req, res){
  */
 
 exports.connect = function(req, res) {
-	res.render('connect', { title: 'Connection to server'});
+	// console.log(req.query.ip)
+	
+	var ip = "127.0.0.1"
+	if(req.query.ip != undefined) {
+		ip = req.query.ip
+	}
+	res.render('connect', { title: 'LabyrinthJS', ip: ip});
 };
 
 
