@@ -280,9 +280,7 @@ var MazeGL = {
 	addObjects : function () {
 		var self = MazeGL
 
-		self.objects.floor = myFloor()
-		
-		self.scene.add(self.objects.floor);
+
 		// self.objects.ceiling = drawCeiling()
 		// self.scene.add(self.objects.ceiling);
 		// Now let's add a cube.
@@ -348,7 +346,8 @@ var MazeGL = {
 		}
 		/////////////////////////////////////////////////////////
 
-
+		self.objects.floor = myFloor(cols, rows)
+		self.scene.add(self.objects.floor);
 		dim = {x: 10, y: 20, z: 10};
 		for (var j = 0; j < cols; j++) {
 			for (var i = 0; i < rows; i++) {

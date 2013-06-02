@@ -14,10 +14,10 @@ function myCube(dim, pos, color) {
 	return cube;
 }
 
-function myFloor (argument) {
+function myFloor (cols, rows) {
 	//PlaneGeometry( width, height, widthSegments, heightSegments )
 	//var floor_geometry = new t.CubeGeometry(30, 1, 30);
-	var floor_geometry = new t.PlaneGeometry(500, 500, 254, 254);
+	var floor_geometry = new t.PlaneGeometry(cols*100, rows*100, 254, 254);
 	floor_geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 	//var floor_geometry = new t.CubeGeometry(30, 1, 30);
 	//.MeshLambertMaterial({color: 0xEDCBA0})
